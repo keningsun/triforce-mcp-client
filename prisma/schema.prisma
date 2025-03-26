@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model accounts {
+  user_id             String
+  type                String
+  provider            String
+  provider_account_id String
+  refresh_token       String?
+  access_token        String?
+  expires_at          Int?
+  token_type          String?
+  scope               String?
+  id_token            String?
+  session_state       String?
+  created_at          DateTime @default(now()) @db.Timestamp(6)
+  updated_at          DateTime @db.Timestamp(6)
+  users               users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([provider, provider_account_id])
+  @@index([user_id])
+}
+
+model authenticators {
+  credential_id          String  @unique
+  user_id                String
+  provider_account_id    String
+  credential_public_key  String
+  counter                Int
+  credential_device_type String
+  credential_backed_up   Boolean
+  transports             String?
+  users                  users   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([user_id, credential_id])
+}
+
+model oauth_tokens {
+  id            String    @id
+  user_id       String
+  provider      String
+  access_token  String
+  refresh_token String?
+  token_type    String?
+  scope         String?
+  expires_at    DateTime? @db.Timestamp(6)
+  extra_data    Json?
+  created_at    DateTime  @default(now()) @db.Timestamp(6)
+  updated_at    DateTime  @db.Timestamp(6)
+  users         users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_id, provider])
+  @@index([provider])
+}
+
+model sessions {
+  session_token String   @unique
+  user_id       String
+  expires       DateTime @db.Timestamp(6)
+  created_at    DateTime @default(now()) @db.Timestamp(6)
+  updated_at    DateTime @db.Timestamp(6)
+  users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id])
+}
+
+model users {
+  id             String           @id
+  name           String?
+  email          String           @unique
+  email_verified DateTime?        @db.Timestamp(6)
+  image          String?
+  created_at     DateTime         @default(now()) @db.Timestamp(6)
+  updated_at     DateTime         @db.Timestamp(6)
+  accounts       accounts[]
+  authenticators authenticators[]
+  oauth_tokens   oauth_tokens[]
+  sessions       sessions[]
+}
+
+model verification_tokens {
+  identifier String
+  token      String
+  expires    DateTime @db.Timestamp(6)
+
+  @@id([identifier, token])
+}
