@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCP Internal Tool</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/themes.css" />
+  </head>
+  <body>
+    <div id="app" class="theme-light">
+      <!-- Auth Screen -->
+      <section id="auth-screen" class="screen active">
+        <div class="auth-container">
+          <div class="logo-container">
+            <div class="logo">MCP</div>
+            <h1>Internal Tool</h1>
+          </div>
+          <p class="welcome-text">
+            Connect your work tools and boost productivity
+          </p>
+
+          <div class="auth-services">
+            <button class="auth-btn" data-service="slack">
+              <i class="fab fa-slack"></i>
+              <span>Connect Slack</span>
+            </button>
+            <button class="auth-btn" data-service="github">
+              <i class="fab fa-github"></i>
+              <span>Connect GitHub</span>
+            </button>
+            <button class="auth-btn" data-service="google">
+              <i class="fab fa-google"></i>
+              <span>Connect Google (Calendar, Gmail)</span>
+            </button>
+          </div>
+
+          <button id="start-app" class="primary-btn" disabled>
+            Get Started
+          </button>
+        </div>
+      </section>
+
+      <!-- Dashboard Screen -->
+      <section id="dashboard-screen" class="screen">
+        <header class="app-header">
+          <div class="logo">MCP</div>
+          <nav class="main-nav">
+            <a href="#" class="nav-item active" data-screen="dashboard"
+              >Dashboard</a
+            >
+            <a href="#" class="nav-item" data-screen="chat">Chat</a>
+            <a href="#" class="nav-item" data-screen="insights">Insights</a>
+          </nav>
+          <div class="header-controls">
+            <button id="theme-toggle"><i class="fas fa-moon"></i></button>
+            <div class="user-menu">
+              <span>User</span>
+              <i class="fas fa-angle-down"></i>
+            </div>
+          </div>
+        </header>
+
+        <div class="dashboard-content">
+          <div class="welcome-banner">
+            <h2>Welcome to MCP Internal Tool</h2>
+            <p>Your connected workplace assistant</p>
+          </div>
+
+          <div class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="action-buttons">
+              <button class="action-btn" data-action="daily-summary">
+                <i class="fas fa-newspaper"></i>
+                <span>Daily Summary</span>
+              </button>
+              <button class="action-btn" data-action="schedule-meeting">
+                <i class="fas fa-calendar-plus"></i>
+                <span>Schedule Meeting</span>
+              </button>
+              <button class="action-btn" data-action="check-messages">
+                <i class="fab fa-slack"></i>
+                <span>Important Messages</span>
+              </button>
+              <button class="action-btn" data-action="github-updates">
+                <i class="fab fa-github"></i>
+                <span>Code Updates</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="stat-widgets">
+            <div class="widget emails-widget">
+              <div class="widget-header">
+                <h3>Email Summary</h3>
+                <span class="badge">5 unread</span>
+              </div>
+              <div class="widget-content">
+                <ul class="email-list">
+                  <li class="email-item unread">
+                    <div class="email-sender">Product Team</div>
+                    <div class="email-subject">Weekly Sprint Update</div>
+                  </li>
+                  <li class="email-item unread">
+                    <div class="email-sender">HR Department</div>
+                    <div class="email-subject">Company All-hands Meeting</div>
+                  </li>
+                  <li class="email-item">
+                    <div class="email-sender">John Smith</div>
+                    <div class="email-subject">Project Timeline Discussion</div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="widget calendar-widget">
+              <div class="widget-header">
+                <h3>Today's Schedule</h3>
+              </div>
+              <div class="widget-content">
+                <ul class="event-list">
+                  <li class="event-item">
+                    <div class="event-time">09:00 - 09:30</div>
+                    <div class="event-title">Daily Standup</div>
+                  </li>
+                  <li class="event-item current">
+                    <div class="event-time">11:00 - 12:00</div>
+                    <div class="event-title">Product Review</div>
+                  </li>
+                  <li class="event-item">
+                    <div class="event-time">14:00 - 15:00</div>
+                    <div class="event-title">Planning Session</div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chat Screen -->
+      <section id="chat-screen" class="screen">
+        <header class="app-header">
+          <div class="logo">MCP</div>
+          <nav class="main-nav">
+            <a href="#" class="nav-item" data-screen="dashboard">Dashboard</a>
+            <a href="#" class="nav-item active" data-screen="chat">Chat</a>
+            <a href="#" class="nav-item" data-screen="insights">Insights</a>
+          </nav>
+          <div class="header-controls">
+            <button id="theme-toggle-chat"><i class="fas fa-moon"></i></button>
+            <div class="user-menu">
+              <span>User</span>
+              <i class="fas fa-angle-down"></i>
+            </div>
+          </div>
+        </header>
+
+        <div class="chat-container">
+          <div class="chat-sidebar">
+            <h3>Suggested Prompts</h3>
+            <ul class="prompt-list">
+              <li class="prompt-item">Summarize my unread Slack messages</li>
+              <li class="prompt-item">Find free meeting times next week</li>
+              <li class="prompt-item">
+                Show me my GitHub PRs waiting for review
+              </li>
+              <li class="prompt-item">
+                Create a summary of yesterday's team meeting
+              </li>
+              <li class="prompt-item">
+                Draft an email to the design team about the new feature
+              </li>
+            </ul>
+          </div>
+          <div class="chat-main">
+            <div class="chat-messages">
+              <div class="message system">
+                <p>Welcome to MCP Assistant. How can I help you today?</p>
+              </div>
+              <div class="message user">
+                <p>Show me my calendar for tomorrow</p>
+              </div>
+              <div class="message assistant">
+                <div class="message-content">
+                  <p>Here's your schedule for tomorrow:</p>
+                  <div class="result-card calendar-result">
+                    <h4>Tomorrow's Schedule</h4>
+                    <ul class="compact-event-list">
+                      <li>
+                        <span class="time">09:00 - 09:30</span>
+                        <span class="title">Weekly Team Sync</span>
+                      </li>
+                      <li>
+                        <span class="time">11:00 - 12:00</span>
+                        <span class="title">Client Meeting - ABC Corp</span>
+                      </li>
+                      <li>
+                        <span class="time">15:00 - 16:00</span>
+                        <span class="title">Product Planning</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="chat-input-container">
+              <textarea
+                class="chat-input"
+                placeholder="Ask anything about your connected tools..."
+              ></textarea>
+              <button class="send-btn">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Insights Screen -->
+      <section id="insights-screen" class="screen">
+        <header class="app-header">
+          <div class="logo">MCP</div>
+          <nav class="main-nav">
+            <a href="#" class="nav-item" data-screen="dashboard">Dashboard</a>
+            <a href="#" class="nav-item" data-screen="chat">Chat</a>
+            <a href="#" class="nav-item active" data-screen="insights"
+              >Insights</a
+            >
+          </nav>
+          <div class="header-controls">
+            <button id="theme-toggle-insights">
+              <i class="fas fa-moon"></i>
+            </button>
+            <div class="user-menu">
+              <span>User</span>
+              <i class="fas fa-angle-down"></i>
+            </div>
+          </div>
+        </header>
+
+        <div class="insights-container">
+          <div class="insights-header">
+            <h2>Work Insights</h2>
+            <div class="time-filter">
+              <button class="time-btn active">Week</button>
+              <button class="time-btn">Month</button>
+              <button class="time-btn">Quarter</button>
+            </div>
+          </div>
+
+          <div class="insights-grid">
+            <div class="insight-card time-allocation">
+              <h3>Time Allocation</h3>
+              <div class="chart-container">
+                <div class="placeholder-chart pie-chart">
+                  <div class="slice slice1" data-percent="45">45% Meetings</div>
+                  <div class="slice slice2" data-percent="30">
+                    30% Development
+                  </div>
+                  <div class="slice slice3" data-percent="15">
+                    15% Communication
+                  </div>
+                  <div class="slice slice4" data-percent="10">10% Other</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="insight-card productivity">
+              <h3>Productivity Score</h3>
+              <div class="chart-container">
+                <div class="productivity-score">
+                  <div class="score-number">7.8</div>
+                  <div class="score-label">out of 10</div>
+                  <div class="score-trend">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0.6 from last week</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="insight-card github-activity">
+              <h3>GitHub Activity</h3>
+              <div class="chart-container">
+                <div class="placeholder-chart bar-chart">
+                  <div class="bar" style="height: 30%" data-value="15">Mon</div>
+                  <div class="bar" style="height: 60%" data-value="30">Tue</div>
+                  <div class="bar" style="height: 40%" data-value="20">Wed</div>
+                  <div class="bar" style="height: 90%" data-value="45">Thu</div>
+                  <div class="bar" style="height: 50%" data-value="25">Fri</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="insight-card communication">
+              <h3>Communication Channels</h3>
+              <div class="chart-container">
+                <div class="channels-breakdown">
+                  <div class="channel-item">
+                    <div class="channel-name">
+                      <i class="fab fa-slack"></i>
+                      <span>Slack</span>
+                    </div>
+                    <div class="channel-bar">
+                      <div class="channel-progress" style="width: 65%"></div>
+                      <span>65%</span>
+                    </div>
+                  </div>
+                  <div class="channel-item">
+                    <div class="channel-name">
+                      <i class="fas fa-envelope"></i>
+                      <span>Email</span>
+                    </div>
+                    <div class="channel-bar">
+                      <div class="channel-progress" style="width: 20%"></div>
+                      <span>20%</span>
+                    </div>
+                  </div>
+                  <div class="channel-item">
+                    <div class="channel-name">
+                      <i class="fas fa-video"></i>
+                      <span>Video Calls</span>
+                    </div>
+                    <div class="channel-bar">
+                      <div class="channel-progress" style="width: 15%"></div>
+                      <span>15%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mobile View -->
+      <section id="mobile-screen" class="screen">
+        <div class="mobile-wrapper">
+          <header class="mobile-header">
+            <div class="logo">MCP</div>
+            <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+          </header>
+
+          <div class="mobile-nav">
+            <a href="#" class="mobile-nav-item active" data-mobile-view="home"
+              >Home</a
+            >
+            <a href="#" class="mobile-nav-item" data-mobile-view="chat">Chat</a>
+            <a href="#" class="mobile-nav-item" data-mobile-view="insights"
+              >Insights</a
+            >
+            <a href="#" class="mobile-nav-item" data-mobile-view="settings"
+              >Settings</a
+            >
+          </div>
+
+          <div class="mobile-view-container">
+            <!-- Mobile Home View -->
+            <div class="mobile-view active" id="mobile-home">
+              <div class="mobile-greeting">
+                <h2>Hello, User</h2>
+                <p>Today's Overview</p>
+              </div>
+
+              <div class="mobile-card">
+                <div class="mobile-card-header">
+                  <h3>Upcoming</h3>
+                  <span class="mobile-badge">Next 2 hours</span>
+                </div>
+                <div class="mobile-card-content">
+                  <div class="mobile-event">
+                    <div class="mobile-event-time">11:00 - 12:00</div>
+                    <div class="mobile-event-title">Product Review</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mobile-card">
+                <div class="mobile-card-header">
+                  <h3>Messages</h3>
+                  <span class="mobile-badge">3 new</span>
+                </div>
+                <div class="mobile-card-content">
+                  <div class="mobile-message">
+                    <div class="mobile-message-sender">Alex from Design</div>
+                    <div class="mobile-message-text">
+                      Updated mockups are ready for review
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mobile-quick-actions">
+                <button class="mobile-action-btn">
+                  <i class="fas fa-bolt"></i>
+                  <span>Quick Summary</span>
+                </button>
+                <button class="mobile-action-btn">
+                  <i class="fas fa-calendar-check"></i>
+                  <span>Schedule</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Mobile Chat View -->
+            <div class="mobile-view" id="mobile-chat">
+              <div class="mobile-chat-container">
+                <div class="mobile-chat-messages">
+                  <div class="mobile-message system">
+                    <p>How can I help you today?</p>
+                  </div>
+                  <div class="mobile-message user">
+                    <p>Summarize my day</p>
+                  </div>
+                  <div class="mobile-message assistant">
+                    <p>
+                      You have 3 meetings today, 5 unread emails, and 2 GitHub
+                      PRs waiting for your review.
+                    </p>
+                  </div>
+                </div>
+                <div class="mobile-chat-input">
+                  <input type="text" placeholder="Ask anything..." />
+                  <button><i class="fas fa-paper-plane"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Insights View -->
+            <div class="mobile-view" id="mobile-insights">
+              <div class="mobile-insights-header">
+                <h3>Weekly Insights</h3>
+              </div>
+              <div class="mobile-insight-card">
+                <h4>Time Allocation</h4>
+                <div class="mobile-chart-placeholder">
+                  <div
+                    class="mobile-pie-segment"
+                    style="--percent: 45%; --color: #4285f4"
+                  >
+                    <span>45% Meetings</span>
+                  </div>
+                  <div
+                    class="mobile-pie-segment"
+                    style="--percent: 30%; --color: #34a853"
+                  >
+                    <span>30% Coding</span>
+                  </div>
+                  <div
+                    class="mobile-pie-segment"
+                    style="--percent: 25%; --color: #fbbc05"
+                  >
+                    <span>25% Other</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Settings View -->
+            <div class="mobile-view" id="mobile-settings">
+              <div class="mobile-settings-header">
+                <h3>Settings</h3>
+              </div>
+              <div class="mobile-settings-options">
+                <div class="mobile-setting-item">
+                  <span>Dark Mode</span>
+                  <label class="switch">
+                    <input type="checkbox" />
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+                <div class="mobile-setting-item">
+                  <span>Notifications</span>
+                  <label class="switch">
+                    <input type="checkbox" checked />
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+                <div class="mobile-setting-item">
+                  <span>Connected Services</span>
+                  <i class="fas fa-chevron-right"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
+
