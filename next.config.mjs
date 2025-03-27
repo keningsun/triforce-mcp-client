@@ -20,9 +20,21 @@ const nextConfig = {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
+    serverMinification: true,
+    optimizePackageImports: [
+      "@radix-ui/react-icons",
+      "@mui/material",
+      "react-icons",
+    ],
   },
   env: {
     MCP_SERVER_BASE_URL: process.env.MCP_SERVER_BASE_URL,
+  },
+  // 确保正确解析组件目录
+  transpilePackages: ["@/components", "@/lib"],
+  // 清除缓存
+  generateBuildId: async () => {
+    return `build-${Date.now()}`;
   },
 };
 
