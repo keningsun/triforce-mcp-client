@@ -74,6 +74,8 @@ export function ChatPanel() {
     handleSendMessage,
     isLoading,
     error,
+    toolData,
+    extractedContent,
   } = useMCPChat({
     userId,
     initialMessages: [
@@ -87,6 +89,7 @@ export function ChatPanel() {
   });
 
   console.log("Current userId for MCP:", userId);
+  console.log("Extracted content:", extractedContent);
 
   return (
     <div className="flex flex-col h-full">
@@ -126,7 +129,37 @@ export function ChatPanel() {
                   : "bg-background border"
               }`}
             >
-              {message.content}
+              {message.content === "" && message.role === "assistant" ? (
+                <div className="text-muted-foreground">
+                  {extractedContent ? (
+                    // 显示从数据流中提取的内容
+                    <div>{extractedContent}</div>
+                  ) : (
+                    <>
+                      <div className="mb-2 font-medium">
+                        Working on your request...
+                      </div>
+                      <div className="flex items-center gap-2 text-sm mb-2">
+                        <Clock className="h-4 w-4" />
+                        <span>Using tools to find information</span>
+                      </div>
+
+                      {toolData && (
+                        <div className="mt-2 border-t pt-2 text-xs">
+                          <div className="font-medium mb-1">
+                            Raw Data Stream:
+                          </div>
+                          <pre className="bg-gray-100 p-2 rounded overflow-x-auto text-xs">
+                            {JSON.stringify(toolData, null, 2)}
+                          </pre>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              ) : (
+                message.content
+              )}
             </div>
 
             {message.role === "user" && (
@@ -167,7 +200,36 @@ export function ChatPanel() {
                 variant="outline"
                 size="sm"
                 className="h-8 gap-1.5 rounded-full bg-muted/50 hover:bg-muted"
-                onClick={() => handleSendMessage(prompt.text)}
+                onClick={() => {
+                  // 模拟在文本框中输入内容
+                  const textarea = document.querySelector("textarea");
+                  if (textarea) {
+                    // 获取原生处理函数
+                    const nativeInputValueSetter =
+                      Object.getOwnPropertyDescriptor(
+                        window.HTMLTextAreaElement.prototype,
+                        "value"
+                      )?.set;
+
+                    if (nativeInputValueSetter) {
+                      nativeInputValueSetter.call(textarea, prompt.text);
+
+                      // 触发输入事件
+                      textarea.dispatchEvent(
+                        new Event("input", { bubbles: true })
+                      );
+
+                      // 触发提交
+                      setTimeout(() => handleSendMessage(prompt.text), 10);
+                    } else {
+                      // 回退方案
+                      handleSendMessage(prompt.text);
+                    }
+                  } else {
+                    // 回退方案
+                    handleSendMessage(prompt.text);
+                  }
+                }}
                 disabled={isLoading}
               >
                 {prompt.icon}
