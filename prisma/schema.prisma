@@ -42,7 +42,7 @@ model authenticators {
 }
 
 model oauth_tokens {
-  id            String    @id
+  id            BigInt    @id @default(autoincrement())
   user_id       String
   provider      String
   access_token  String

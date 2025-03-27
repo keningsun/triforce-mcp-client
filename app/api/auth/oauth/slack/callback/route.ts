@@ -135,7 +135,6 @@ export async function GET(request: Request) {
       // 创建新令牌
       await prisma.oauth_tokens.create({
         data: {
-          id: uuidv4(),
           user_id: user.id,
           provider: "slack",
           access_token: tokenData.access_token,
@@ -178,9 +177,17 @@ export async function GET(request: Request) {
       { headers: { "Content-Type": "text/html; charset=utf-8" } }
     );
   } catch (error) {
-    console.error("Slack OAuth callback error:", error);
+    // 更详细的错误记录
+    const err = error as Error;
+    console.error("Slack OAuth callback error:", {
+      message: err.message,
+      stack: err.stack,
+      name: err.name,
+      code: (err as any).code,
+      cause: err.cause,
+    });
 
-    // 错误时也返回HTML，自动关闭窗口
+    // 错误时也返回HTML，自动关闭窗口 - 使用正确的NextResponse格式
     return new NextResponse(
       `
       <html>
