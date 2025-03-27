@@ -158,14 +158,32 @@ export function ConnectedServicesDialog({
       `width=${width},height=${height},left=${left},top=${top}`
     );
 
-    // 监听认证窗口关闭事件
-    const checkClosed = setInterval(() => {
-      if (authWindow?.closed) {
-        clearInterval(checkClosed);
-        fetchConnectedServices(); // 重新获取连接状态
-      }
-    }, 500);
+    // 不再通过窗口关闭检测来刷新状态，而是通过postMessage接收通知
   };
+
+  // 添加消息事件监听器，处理OAuth回调
+  useEffect(() => {
+    const handleOAuthCallback = (event: MessageEvent) => {
+      // 验证消息类型
+      if (event.data?.type === "OAUTH_CALLBACK") {
+        // 获取服务提供商和授权结果
+        const { provider, success } = event.data;
+
+        // 如果授权成功，刷新连接状态
+        if (success) {
+          fetchConnectedServices();
+        }
+      }
+    };
+
+    // 添加消息事件监听器
+    window.addEventListener("message", handleOAuthCallback);
+
+    // 清理监听器
+    return () => {
+      window.removeEventListener("message", handleOAuthCallback);
+    };
+  }, []);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

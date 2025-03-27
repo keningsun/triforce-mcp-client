@@ -148,14 +148,66 @@ export async function GET(request: Request) {
       });
     }
 
-    // 成功后重定向
-    return NextResponse.redirect(
-      `${process.env.NEXTAUTH_URL}/settings/integrations?success=slack_connected`
+    // 成功后返回HTML，自动关闭窗口
+    return new NextResponse(
+      `
+      <html>
+        <head>
+          <title>Authorization Successful</title>
+          <script>
+            window.onload = function() {
+              window.opener.postMessage({ type: 'OAUTH_CALLBACK', provider: 'slack', success: true }, '*');
+              setTimeout(function() {
+                window.close();
+              }, 1000);
+            }
+          </script>
+          <style>
+            body { 
+              font-family: system-ui, sans-serif;
+              text-align: center;
+              padding-top: 50px;
+            }
+          </style>
+        </head>
+        <body>
+          Authorization successful. This window will close automatically.
+        </body>
+      </html>
+      `,
+      { headers: { "Content-Type": "text/html; charset=utf-8" } }
     );
   } catch (error) {
     console.error("Slack OAuth callback error:", error);
-    return NextResponse.redirect(
-      `${process.env.NEXTAUTH_URL}/settings/integrations?error=server_error`
+
+    // 错误时也返回HTML，自动关闭窗口
+    return new NextResponse(
+      `
+      <html>
+        <head>
+          <title>Authorization Failed</title>
+          <script>
+            window.onload = function() {
+              window.opener.postMessage({ type: 'OAUTH_CALLBACK', provider: 'slack', success: false }, '*');
+              setTimeout(function() {
+                window.close();
+              }, 1000);
+            }
+          </script>
+          <style>
+            body { 
+              font-family: system-ui, sans-serif;
+              text-align: center;
+              padding-top: 50px;
+            }
+          </style>
+        </head>
+        <body>
+          Authorization failed. This window will close automatically.
+        </body>
+      </html>
+      `,
+      { headers: { "Content-Type": "text/html; charset=utf-8" } }
     );
   }
 }

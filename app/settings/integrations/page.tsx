@@ -16,8 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, MessageSquareIcon, FileTextIcon } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "集成设置",
-  description: "管理您的第三方服务集成",
+  title: "Integration Settings",
+  description: "Manage your third-party service integrations",
 };
 
 const prisma = new PrismaClient();
@@ -58,9 +58,10 @@ export default async function IntegrationsPage() {
 
   return (
     <div className="container py-10">
-      <h1 className="text-3xl font-bold mb-6">集成设置</h1>
+      <h1 className="text-3xl font-bold mb-6">Integration Settings</h1>
       <p className="text-muted-foreground mb-10">
-        连接您的第三方服务，以便助手可以为您提供更多功能。
+        Connect your third-party services to enable more features for your
+        assistant.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -70,7 +71,7 @@ export default async function IntegrationsPage() {
             <CardTitle className="text-lg font-bold">Slack</CardTitle>
             {isSlackConnected && (
               <Badge variant="outline" className="bg-green-100 text-green-800">
-                已连接
+                Connected
               </Badge>
             )}
           </CardHeader>
@@ -78,9 +79,11 @@ export default async function IntegrationsPage() {
             <div className="flex items-center mb-4">
               <MessageSquareIcon className="h-8 w-8 text-[#4A154B] mr-3" />
               <div>
-                <p className="text-sm font-medium">连接您的Slack工作区</p>
+                <p className="text-sm font-medium">
+                  Connect your Slack workspace
+                </p>
                 <p className="text-xs text-muted-foreground">
-                  发送消息，查看频道等
+                  Send messages, view channels, etc.
                 </p>
               </div>
             </div>
@@ -88,14 +91,14 @@ export default async function IntegrationsPage() {
           <CardFooter>
             {isSlackConnected ? (
               <Button variant="destructive" className="w-full" asChild>
-                <a href="/api/auth/oauth/slack/disconnect">断开连接</a>
+                <a href="/api/auth/oauth/slack/disconnect">Disconnect</a>
               </Button>
             ) : (
               <Button
                 className="w-full bg-[#4A154B] hover:bg-[#3a1039]"
                 asChild
               >
-                <a href="/api/auth/oauth/slack">连接Slack</a>
+                <a href="/api/auth/oauth/slack">Connect Slack</a>
               </Button>
             )}
           </CardFooter>
@@ -107,7 +110,7 @@ export default async function IntegrationsPage() {
             <CardTitle className="text-lg font-bold">Google Calendar</CardTitle>
             {isGoogleConnected && (
               <Badge variant="outline" className="bg-green-100 text-green-800">
-                已连接
+                Connected
               </Badge>
             )}
           </CardHeader>
@@ -115,9 +118,11 @@ export default async function IntegrationsPage() {
             <div className="flex items-center mb-4">
               <CalendarIcon className="h-8 w-8 text-[#4285F4] mr-3" />
               <div>
-                <p className="text-sm font-medium">连接您的Google日历</p>
+                <p className="text-sm font-medium">
+                  Connect your Google Calendar
+                </p>
                 <p className="text-xs text-muted-foreground">
-                  查看和创建日历事件
+                  View and create calendar events
                 </p>
               </div>
             </div>
@@ -125,14 +130,14 @@ export default async function IntegrationsPage() {
           <CardFooter>
             {isGoogleConnected ? (
               <Button variant="destructive" className="w-full" asChild>
-                <a href="/api/auth/oauth/google/disconnect">断开连接</a>
+                <a href="/api/auth/oauth/google/disconnect">Disconnect</a>
               </Button>
             ) : (
               <Button
                 className="w-full bg-[#4285F4] hover:bg-[#3367d6]"
                 asChild
               >
-                <a href="/api/auth/oauth/google">连接Google</a>
+                <a href="/api/auth/oauth/google">Connect Google</a>
               </Button>
             )}
           </CardFooter>
@@ -144,7 +149,7 @@ export default async function IntegrationsPage() {
             <CardTitle className="text-lg font-bold">Notion</CardTitle>
             {isNotionConnected && (
               <Badge variant="outline" className="bg-green-100 text-green-800">
-                已连接
+                Connected
               </Badge>
             )}
           </CardHeader>
@@ -152,9 +157,11 @@ export default async function IntegrationsPage() {
             <div className="flex items-center mb-4">
               <FileTextIcon className="h-8 w-8 text-black mr-3" />
               <div>
-                <p className="text-sm font-medium">连接您的Notion工作区</p>
+                <p className="text-sm font-medium">
+                  Connect your Notion workspace
+                </p>
                 <p className="text-xs text-muted-foreground">
-                  查看和创建Notion页面和数据库
+                  View and create Notion pages and databases
                 </p>
               </div>
             </div>
@@ -162,11 +169,11 @@ export default async function IntegrationsPage() {
           <CardFooter>
             {isNotionConnected ? (
               <Button variant="destructive" className="w-full" asChild>
-                <a href="/api/auth/oauth/notion/disconnect">断开连接</a>
+                <a href="/api/auth/oauth/notion/disconnect">Disconnect</a>
               </Button>
             ) : (
               <Button className="w-full" asChild>
-                <a href="/api/auth/oauth/notion">连接Notion</a>
+                <a href="/api/auth/oauth/notion">Connect Notion</a>
               </Button>
             )}
           </CardFooter>
