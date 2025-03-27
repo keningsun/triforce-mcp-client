@@ -6,10 +6,14 @@ import { v4 as uuidv4 } from "uuid";
 const prisma = new PrismaClient();
 
 // Slack OAuth配置
-const SLACK_CLIENT_ID = process.env.SLACK_CLIENT_ID || "";
-const SLACK_CLIENT_SECRET = process.env.SLACK_CLIENT_SECRET || "";
+const SLACK_CLIENT_ID = String(process.env.SLACK_CLIENT_ID || "");
+const SLACK_CLIENT_SECRET = String(process.env.SLACK_CLIENT_SECRET || "");
 const SLACK_REDIRECT_URI = `${process.env.NEXTAUTH_URL}/api/auth/oauth/slack/callback`;
 const SLACK_SCOPES = "chat:write,channels:read,users:read";
+
+// 输出环境变量值用于调试
+console.log("SLACK_CLIENT_ID:", SLACK_CLIENT_ID);
+console.log("SLACK_REDIRECT_URI:", SLACK_REDIRECT_URI);
 
 // Slack OAuth授权入口点
 export async function GET() {
@@ -21,6 +25,13 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // 打印环境变量，确认在请求处理时是否正确加载
+    console.log("In Slack GET request - SLACK_CLIENT_ID:", SLACK_CLIENT_ID);
+    console.log(
+      "In Slack GET request - NEXTAUTH_URL:",
+      process.env.NEXTAUTH_URL
+    );
+
     // 生成OAuth状态值（防止CSRF攻击）
     const state = uuidv4();
 
@@ -30,6 +41,9 @@ export async function GET() {
     authUrl.searchParams.set("scope", SLACK_SCOPES);
     authUrl.searchParams.set("redirect_uri", SLACK_REDIRECT_URI);
     authUrl.searchParams.set("state", state);
+
+    // 打印完整的授权URL
+    console.log("Slack Auth URL:", authUrl.toString());
 
     // 将状态值存储到数据库，用于回调验证
     await prisma.verification_tokens.create({
@@ -43,10 +57,14 @@ export async function GET() {
     // 重定向到Slack授权页面
     return NextResponse.redirect(authUrl.toString());
   } catch (error) {
-    console.error("Slack OAuth error:", error);
-    return NextResponse.json(
-      { error: "Failed to initiate Slack OAuth flow" },
-      { status: 500 }
+    // 使用明确的错误处理，避免任何语法问题
+    console.log("Slack OAuth error:", error);
+    return new Response(
+      JSON.stringify({ error: "Failed to initiate Slack OAuth flow" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
     );
   }
 }

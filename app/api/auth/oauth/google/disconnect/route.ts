@@ -55,7 +55,10 @@ export async function DELETE() {
     const session = await getServerSession();
 
     if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // 查找用户
@@ -66,21 +69,36 @@ export async function DELETE() {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return new Response(JSON.stringify({ error: "User not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
+    console.log(
+      `Attempting to delete OAuth token for user: ${user.id}, provider: google`
+    );
+
     // 删除Google令牌
-    await prisma.oauth_tokens.deleteMany({
+    const result = await prisma.oauth_tokens.deleteMany({
       where: {
         user_id: user.id,
         provider: "google",
       },
     });
 
+    console.log(`Deleted ${result.count} OAuth tokens`);
+
     // 返回成功响应
-    return NextResponse.json({ success: true });
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error("Google OAuth disconnect error:", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    console.log("Google OAuth disconnect error:", error);
+    return new Response(JSON.stringify({ error: "Server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
