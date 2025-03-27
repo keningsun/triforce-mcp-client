@@ -44,3 +44,7 @@ next-env.d.ts
 /components/dashboard-screen.tsx
 /components/insights-screen.tsx
 /components/mobile-screen.tsx
+
+# package lock files
+package-lock.json
+# 但保留pnpm-lock.yaml文件
