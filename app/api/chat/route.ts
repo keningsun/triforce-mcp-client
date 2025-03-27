@@ -1,5 +1,6 @@
 import { experimental_createMCPClient, streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
+import { refreshGoogleToken } from "@/lib/refresh-google-token";
 
 // 添加超时函数辅助函数
 const withTimeout = <T>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
@@ -36,6 +37,29 @@ const setupMcpHeartbeat = (mcpClient: any) => {
   }, HEARTBEAT_INTERVAL);
 
   return heartbeatInterval;
+};
+
+// 在调用MCP客户端前刷新Google令牌
+const refreshGoogleTokenBeforeUse = async (userId: string) => {
+  try {
+    console.log(`尝试刷新用户 ${userId} 的Google OAuth令牌...`);
+    const result = await refreshGoogleToken(userId);
+
+    if (result.success) {
+      if (result.refreshed) {
+        console.log("Google令牌已成功刷新，过期时间:", result.expires_at);
+      } else {
+        console.log("Google令牌未过期，无需刷新");
+      }
+      return true;
+    } else {
+      console.warn("无法刷新Google令牌:", result.error);
+      return false;
+    }
+  } catch (error) {
+    console.error("刷新Google令牌时出错:", error);
+    return false;
+  }
 };
 
 // 创建MCP客户端的函数
@@ -303,6 +327,12 @@ export async function POST(req: Request) {
     console.log("OpenAI API key is present (length):", openaiKey.length);
 
     try {
+      // 在调用MCP客户端前刷新Google令牌
+      const refreshSuccess = await refreshGoogleTokenBeforeUse(userId);
+      if (!refreshSuccess) {
+        throw new Error("Google令牌刷新失败");
+      }
+
       // 使用带超时的MCP客户端创建
       console.log("Creating MCP client...");
       mcpClient = await withTimeout(

@@ -88,7 +88,7 @@ export function useMCPChat({ userId, initialMessages = [] }: UseMCPChatProps) {
       role: msg.role,
       content: msg.content,
     })),
-    maxSteps: 3, // 允许最多3轮工具调用循环
+    maxSteps: 20, // 允许最多3轮工具调用循环
     onFinish: (message) => {
       console.log("onFinish called with message:", message);
     },
