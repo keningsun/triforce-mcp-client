@@ -1,29 +1,4 @@
 {
   "version": 2,
-  "buildCommand": "next build",
-  "devCommand": "next dev",
-  "cleanUrls": true,
-  "framework": "nextjs",
-  "git": {
-    "deploymentEnabled": {
-      "main": true
-    }
-  },
-  "github": {
-    "enabled": true,
-    "silent": false
-  },
-  "builds": [
-    {
-      "src": "next.config.mjs",
-      "use": "@vercel/next",
-      "config": {
-        "nodeVersion": "18.x",
-        "buildCommand": "next build"
-      }
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  "framework": "nextjs"
 }
