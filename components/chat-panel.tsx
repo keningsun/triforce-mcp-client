@@ -1,10 +1,8 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import {
   SendHorizontal,
   Sparkles,
@@ -17,20 +15,17 @@ import {
   Clock,
   Lightbulb,
   Code,
-} from "lucide-react"
-import { TriforceIcon } from "./triforce-icon"
-
-type Message = {
-  id: string
-  role: "user" | "assistant" | "system"
-  content: string
-  timestamp: Date
-}
+  AlertCircle,
+} from "lucide-react";
+import { TriforceIcon } from "./triforce-icon";
+import { useMCPChat } from "@/lib/hooks/use-mcp-chat";
+import { useSession } from "next-auth/react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type SuggestedPrompt = {
-  text: string
-  icon: React.ReactNode
-}
+  text: string;
+  icon: React.ReactNode;
+};
 
 const suggestedPrompts: SuggestedPrompt[] = [
   {
@@ -65,55 +60,51 @@ const suggestedPrompts: SuggestedPrompt[] = [
     text: "Suggest ways to improve our API performance",
     icon: <Lightbulb className="h-4 w-4" />,
   },
-]
+];
 
 export function ChatPanel() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "system",
-      content: "Welcome to Triforce. How can I help you today?",
-      timestamp: new Date(),
-    },
-  ])
+  const { data: session } = useSession();
+  const userId = session?.user?.id || "demo-user";
 
-  const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-
-  const handleSend = (content: string = input) => {
-    if (!content.trim()) return
-
-    // Add user message
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: content,
-      timestamp: new Date(),
-    }
-
-    setMessages((prev) => [...prev, userMessage])
-    setInput("")
-    setIsLoading(true)
-
-    // Simulate AI response
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: "I'm processing your request. Here's what I found based on your connected services...",
+  // 使用我们的MCP聊天hook
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSendMessage,
+    isLoading,
+    error,
+  } = useMCPChat({
+    userId,
+    initialMessages: [
+      {
+        id: "1",
+        role: "system",
+        content: "Welcome to Triforce. How can I help you today?",
         timestamp: new Date(),
-      }
+      },
+    ],
+  });
 
-      setMessages((prev) => [...prev, assistantMessage])
-      setIsLoading(false)
-    }, 1500)
-  }
+  console.log("Current userId for MCP:", userId);
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-auto p-4 space-y-4">
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         {messages.map((message) => (
-          <div key={message.id} className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+          <div
+            key={message.id}
+            className={`flex gap-3 ${
+              message.role === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
             {message.role !== "user" && (
               <div className="flex-shrink-0 h-8 w-8 rounded-full bg-[#1E6B68] flex items-center justify-center">
                 {message.role === "system" ? (
@@ -131,8 +122,8 @@ export function ChatPanel() {
                 message.role === "user"
                   ? "bg-[#1E6B68] text-white"
                   : message.role === "system"
-                    ? "bg-muted"
-                    : "bg-background border"
+                  ? "bg-muted"
+                  : "bg-background border"
               }`}
             >
               {message.content}
@@ -176,7 +167,8 @@ export function ChatPanel() {
                 variant="outline"
                 size="sm"
                 className="h-8 gap-1.5 rounded-full bg-muted/50 hover:bg-muted"
-                onClick={() => handleSend(prompt.text)}
+                onClick={() => handleSendMessage(prompt.text)}
+                disabled={isLoading}
               >
                 {prompt.icon}
                 <span className="text-xs">{prompt.text}</span>
@@ -190,17 +182,18 @@ export function ChatPanel() {
             placeholder="Ask a question..."
             className="min-h-[60px] resize-none"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault()
-                handleSend()
+                e.preventDefault();
+                handleSendMessage();
               }
             }}
+            disabled={isLoading}
           />
           <Button
             size="icon"
-            onClick={() => handleSend()}
+            onClick={() => handleSendMessage()}
             disabled={!input.trim() || isLoading}
             style={{ backgroundColor: "#1E6B68" }}
           >
@@ -209,6 +202,5 @@ export function ChatPanel() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
