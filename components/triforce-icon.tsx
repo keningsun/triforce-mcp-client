@@ -1,27 +1,33 @@
-"use client"
+"use client";
 
-import { useTheme } from "next-themes"
-import { useEffect, useState } from "react"
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 interface TriforceIconProps {
-  className?: string
-  color?: string
+  className?: string;
+  color?: string;
 }
 
 export function TriforceIcon({ className = "", color }: TriforceIconProps) {
-  const { theme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   // Ensure component is mounted to avoid hydration mismatch
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   // Use provided color or theme-based color
-  const iconColor = color || (mounted && theme === "dark" ? "#25918D" : "#1E6B68")
+  const iconColor =
+    color || (mounted && theme === "dark" ? "#25918D" : "#1E6B68");
 
   return (
-    <svg className={className} viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      className={className}
+      viewBox="0 0 46 46"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -29,6 +35,5 @@ export function TriforceIcon({ className = "", color }: TriforceIconProps) {
         fill={iconColor}
       />
     </svg>
-  )
+  );
 }
-
