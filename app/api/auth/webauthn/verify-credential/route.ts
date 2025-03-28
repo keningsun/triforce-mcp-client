@@ -44,18 +44,25 @@ function getDynamicRpId(requestUrl: string) {
 
 // 获取预期的Origin
 function getDynamicOrigin(requestUrl: string) {
-  // If NEXTAUTH_URL is explicitly set in env vars, use it
-  if (process.env.NEXTAUTH_URL) {
+  // For production Vercel deployment, force HTTPS protocol
+  if (process.env.NODE_ENV === "production" && process.env.NEXTAUTH_URL) {
     return process.env.NEXTAUTH_URL;
   }
 
-  // Extract origin from request URL
+  // For Vercel deployments, always use HTTPS origin
   try {
     const url = new URL(requestUrl);
+    // Check if this is a Vercel deployment
+    if (url.hostname.includes("vercel.app")) {
+      return `https://${url.hostname}`;
+    }
+
+    // For other environments, use the protocol from the request
     return `${url.protocol}//${url.host}`;
   } catch (error) {
-    // Fallback
-    return "http://localhost:3000";
+    console.error("Error parsing URL:", error);
+    // Fallback for local development
+    return process.env.NEXTAUTH_URL || "http://localhost:3000";
   }
 }
 
@@ -117,17 +124,31 @@ export async function POST(req: Request) {
         const verification = await verifyRegistrationResponse({
           response: credential as RegistrationResponseJSON,
           expectedChallenge: storedChallenge.token,
-          expectedOrigin,
+          expectedOrigin: [
+            expectedOrigin,
+            "https://triforce-mcp-client.vercel.app",
+          ],
           expectedRPID: rpID,
           requireUserVerification: false,
         });
 
         if (!verification.verified) {
+          console.error("验证失败，详细信息:", {
+            credential,
+            expectedOrigin,
+            expectedRPID: rpID,
+            challenge: storedChallenge.token.substring(0, 10) + "...", // 只打印部分挑战以免泄露信息
+          });
           return NextResponse.json(
             { error: "Verification failed" },
             { status: 400 }
           );
         }
+
+        console.log("注册验证成功!", {
+          origin: expectedOrigin,
+          rpID,
+        });
 
         // 将验证的凭据保存到数据库
         // @ts-ignore 忽略类型检查，SimpleWebAuthn v9 中 registrationInfo 结构有变化
@@ -299,7 +320,10 @@ export async function POST(req: Request) {
         const verification = await verifyAuthenticationResponse({
           response: credential as AuthenticationResponseJSON,
           expectedChallenge: storedChallenge.token,
-          expectedOrigin,
+          expectedOrigin: [
+            expectedOrigin,
+            "https://triforce-mcp-client.vercel.app",
+          ],
           expectedRPID: rpID,
           requireUserVerification: false,
           authenticator: {
@@ -316,6 +340,9 @@ export async function POST(req: Request) {
         console.log("认证验证结果:", {
           verified: verification.verified,
           newCounter: verification.authenticationInfo.newCounter,
+          expectedOrigin,
+          rpID,
+          challenge: storedChallenge.token.substring(0, 10) + "...",
         });
 
         if (!verification.verified) {

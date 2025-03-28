@@ -37,16 +37,44 @@ function getDynamicRpId(requestUrl: string) {
   }
 }
 
+// 获取预期的Origin
+function getDynamicOrigin(requestUrl: string) {
+  // For production Vercel deployment, force HTTPS protocol
+  if (process.env.NODE_ENV === "production" && process.env.NEXTAUTH_URL) {
+    return process.env.NEXTAUTH_URL;
+  }
+
+  // For Vercel deployments, always use HTTPS origin
+  try {
+    const url = new URL(requestUrl);
+    // Check if this is a Vercel deployment
+    if (url.hostname.includes("vercel.app")) {
+      return `https://${url.hostname}`;
+    }
+
+    // For other environments, use the protocol from the request
+    return `${url.protocol}//${url.host}`;
+  } catch (error) {
+    console.error("Error parsing URL:", error);
+    // Fallback for local development
+    return process.env.NEXTAUTH_URL || "http://localhost:3000";
+  }
+}
+
 // WebAuthn登录注册中使用的RP名称
 const rpName = "Triforce App";
-// 确保使用环境变量作为主要来源，本地URL作为后备
-const expectedOrigin = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
 export async function POST(req: Request) {
   try {
     // Get dynamic RP ID based on request
     const rpID = getDynamicRpId(req.url);
-    console.log("Using WebAuthn RP ID:", rpID);
+    const expectedOrigin = getDynamicOrigin(req.url);
+
+    console.log("Using WebAuthn Configuration:", {
+      rpID,
+      expectedOrigin,
+      env: process.env.NODE_ENV,
+    });
 
     let body;
     try {
