@@ -84,10 +84,10 @@ export const config = {
   matcher: [
     /*
      * 更精确的匹配路径:
-     * 1. 排除静态资源
+     * 1. 排除静态资源和API日志路由
      * 2. 仅匹配页面路由
      */
-    "/((?!_next/static|_next/image|_next/data|favicon.ico).*)",
+    "/((?!_next/static|_next/image|_next/data|api/auth/_log|favicon.ico).*)",
     "/",
     "/dashboard",
     "/login",

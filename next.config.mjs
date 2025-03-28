@@ -16,14 +16,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // 简化实验性特性，减少潜在问题
-  experimental: {
-    optimizePackageImports: [
-      "@radix-ui/react-icons",
-      "@mui/material",
-      "react-icons",
-    ],
-  },
+  // 移除13.3+特有的实验性特性
+  experimental: {},
   env: {
     MCP_SERVER_BASE_URL: process.env.MCP_SERVER_BASE_URL,
   },
