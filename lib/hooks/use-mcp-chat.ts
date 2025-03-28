@@ -205,21 +205,8 @@ export function useMCPChat({ userId, initialMessages = [] }: UseMCPChatProps) {
   // 当 AI SDK 消息更新时，更新我们的消息，同时考虑提取的内容
   useEffect(() => {
     if (aiMessages.length > 0) {
+      // 创建一个新的消息数组，避免直接依赖 extractedContent
       const convertedMessages = aiMessages.map((msg) => {
-        // 检查是否是空内容的助手消息且有提取到的内容
-        if (
-          msg.role === "assistant" &&
-          msg.content === "" &&
-          extractedContent
-        ) {
-          return {
-            id: msg.id,
-            role: msg.role as "user" | "assistant" | "system",
-            content: extractedContent, // 使用提取的内容
-            timestamp: new Date(),
-          };
-        }
-
         return {
           id: msg.id,
           role: msg.role as "user" | "assistant" | "system",
@@ -230,7 +217,7 @@ export function useMCPChat({ userId, initialMessages = [] }: UseMCPChatProps) {
 
       setMessages(convertedMessages);
     }
-  }, [aiMessages, extractedContent]);
+  }, [aiMessages]); // 只依赖 aiMessages，移除对 extractedContent 的依赖
 
   // 当 AI SDK 错误更新时，更新我们的错误
   useEffect(() => {
@@ -272,6 +259,38 @@ export function useMCPChat({ userId, initialMessages = [] }: UseMCPChatProps) {
       console.log("Tool usage may be in progress");
     }
   }, [aiMessages]);
+
+  // 单独处理 extractedContent 到最后一条 assistant 消息
+  useEffect(() => {
+    // 确保有提取内容，且当前有消息
+    if (extractedContent && aiMessages.length > 0) {
+      // 找到最后一条助手消息
+      const lastAssistantMsgIndex = [...aiMessages]
+        .reverse()
+        .findIndex((msg) => msg.role === "assistant" && msg.content === "");
+
+      if (lastAssistantMsgIndex >= 0) {
+        // 计算实际索引（从数组末尾倒数）
+        const actualIndex = aiMessages.length - 1 - lastAssistantMsgIndex;
+
+        // 更新特定消息而不是整个消息数组
+        setMessages((prevMessages) => {
+          // 确保我们有足够的消息
+          if (prevMessages.length <= actualIndex) return prevMessages;
+
+          // 创建新的消息数组
+          const newMessages = [...prevMessages];
+          // 只更新特定的消息
+          newMessages[actualIndex] = {
+            ...newMessages[actualIndex],
+            content: extractedContent,
+          };
+
+          return newMessages;
+        });
+      }
+    }
+  }, [extractedContent, aiMessages]); // 这个 effect 依赖于 extractedContent 和 aiMessages
 
   // 适配 handleSendMessage 方法
   const handleSendMessage = useCallback(

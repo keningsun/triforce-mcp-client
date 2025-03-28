@@ -157,7 +157,7 @@ export function ChatPanel() {
                     </>
                   )}
                 </div>
-              ) : message.role === "assistant" ? (
+              ) : message.role === "assistant" && message.content ? (
                 <MarkdownRenderer content={message.content} />
               ) : (
                 message.content
