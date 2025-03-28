@@ -10,7 +10,6 @@ import {
   User,
   Calendar,
   MessageSquare,
-  Github,
   FileText,
   Clock,
   Lightbulb,
@@ -38,8 +37,8 @@ const suggestedPrompts: SuggestedPrompt[] = [
     icon: <Calendar className="h-4 w-4" />,
   },
   {
-    text: "Show me my pending GitHub PRs",
-    icon: <Github className="h-4 w-4" />,
+    text: "Show me my recent Notion pages",
+    icon: <FileText className="h-4 w-4" />,
   },
   {
     text: "What are my top priorities for today?",

@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useRef, useEffect } from "react"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
+import { useState, useRef, useEffect } from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import {
   BarChart,
   ChevronDown,
@@ -26,11 +26,17 @@ import {
   GripVertical,
   Edit2,
   ArrowRight,
-} from "lucide-react"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { Checkbox } from "@/components/ui/checkbox"
-import { cn } from "@/lib/utils"
+  Database,
+  Bookmark,
+} from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 import {
   DndContext,
   closestCenter,
@@ -39,15 +45,15 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
-} from "@dnd-kit/core"
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 /**
  * InfoPanel Component
@@ -66,34 +72,34 @@ import { CSS } from "@dnd-kit/utilities"
  * These interfaces define the data structure for Activity Insights and Action Items
  */
 interface ActivityItem {
-  id: string
-  text: string
-  time?: string
-  link?: string
-  linkText?: string
-  priority?: "high" | "medium" | "low"
+  id: string;
+  text: string;
+  time?: string;
+  link?: string;
+  linkText?: string;
+  priority?: "high" | "medium" | "low";
 }
 
 interface ActivitySection {
-  title: string
-  icon: React.ReactNode
-  items: ActivityItem[]
+  title: string;
+  icon: React.ReactNode;
+  items: ActivityItem[];
 }
 
 interface ActivityInsight {
-  id: string
-  timestamp: string
-  summary: string
-  details: ActivitySection[]
-  recommendations: string[]
+  id: string;
+  timestamp: string;
+  summary: string;
+  details: ActivitySection[];
+  recommendations: string[];
 }
 
 interface ActionItem {
-  id: string
-  text: string
-  prompt: string
-  completed: boolean
-  priority?: "high" | "medium" | "low"
+  id: string;
+  text: string;
+  prompt: string;
+  completed: boolean;
+  priority?: "high" | "medium" | "low";
 }
 
 /**
@@ -102,14 +108,14 @@ interface ActionItem {
 
 // Format timestamp to show date and time without year
 function formatTimestamp(timestamp: string): string {
-  const date = new Date(timestamp)
+  const date = new Date(timestamp);
   return date.toLocaleString(undefined, {
     month: "short",
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
-  })
+  });
 }
 
 /**
@@ -133,43 +139,44 @@ function SortableActionItem({
   handlePromptAction,
   updateActionText,
 }: {
-  action: ActionItem
-  toggleCompleted: (id: string) => void
-  handlePromptAction: (prompt: string) => void
-  updateActionText: (id: string, text: string) => void
+  action: ActionItem;
+  toggleCompleted: (id: string) => void;
+  handlePromptAction: (prompt: string) => void;
+  updateActionText: (id: string, text: string) => void;
 }) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [editText, setEditText] = useState(action.text)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(action.text);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: action.id })
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: action.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-  }
+  };
 
   const startEditing = () => {
-    setIsEditing(true)
+    setIsEditing(true);
     setTimeout(() => {
-      inputRef.current?.focus()
-      inputRef.current?.select()
-    }, 0)
-  }
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }, 0);
+  };
 
   const saveEdit = () => {
-    updateActionText(action.id, editText)
-    setIsEditing(false)
-  }
+    updateActionText(action.id, editText);
+    setIsEditing(false);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      saveEdit()
+      saveEdit();
     } else if (e.key === "Escape") {
-      setEditText(action.text)
-      setIsEditing(false)
+      setEditText(action.text);
+      setIsEditing(false);
     }
-  }
+  };
 
   return (
     <div
@@ -178,10 +185,16 @@ function SortableActionItem({
       className={cn(
         "flex items-center gap-2 p-2 border rounded-md h-[50px]",
         action.completed ? "bg-muted/50" : "",
-        action.priority === "high" && !action.completed ? "border-l-4 border-l-amber-500" : "",
+        action.priority === "high" && !action.completed
+          ? "border-l-4 border-l-amber-500"
+          : ""
       )}
     >
-      <div className="cursor-grab touch-none flex items-center h-full px-1" {...attributes} {...listeners}>
+      <div
+        className="cursor-grab touch-none flex items-center h-full px-1"
+        {...attributes}
+        {...listeners}
+      >
         <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
       </div>
 
@@ -208,13 +221,18 @@ function SortableActionItem({
               htmlFor={`action-${action.id}`}
               className={cn(
                 "text-xs font-medium cursor-pointer truncate flex-1",
-                action.completed ? "line-through text-muted-foreground" : "",
+                action.completed ? "line-through text-muted-foreground" : ""
               )}
             >
               {action.text}
             </label>
 
-            <Button variant="ghost" size="sm" className="h-5 w-5 p-0" onClick={startEditing}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-5 w-5 p-0"
+              onClick={startEditing}
+            >
               <Edit2 className="h-3 w-3 text-muted-foreground" />
               <span className="sr-only">Edit</span>
             </Button>
@@ -235,7 +253,7 @@ function SortableActionItem({
         </Button>
       )}
     </div>
-  )
+  );
 }
 
 /**
@@ -251,12 +269,15 @@ function SortableActionItem({
  * - Editing action text
  */
 export function InfoPanel() {
-  const [activityInsights, setActivityInsights] = useState<ActivityInsight[]>([])
+  const [activityInsights, setActivityInsights] = useState<ActivityInsight[]>(
+    []
+  );
   const [actions, setActions] = useState<ActionItem[]>([
     {
       id: "action1",
       text: "Review PR #342 from Sarah about responsive design",
-      prompt: "Remind me what I need to look for in Sarah's PR about responsive design",
+      prompt:
+        "Remind me what I need to look for in Sarah's PR about responsive design",
       completed: false,
       priority: "high",
     },
@@ -292,23 +313,23 @@ export function InfoPanel() {
       prompt: "Create a checklist for today's code review meeting at 3:00 PM",
       completed: false,
     },
-  ])
+  ]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  )
+    })
+  );
 
   // Initialize with a default Activity Insight on component mount
   // This ensures users see relevant information immediately upon login
   useEffect(() => {
     if (activityInsights.length === 0) {
-      const defaultInsight = generateDevelopmentScenario()
-      setActivityInsights([defaultInsight])
+      const defaultInsight = generateDevelopmentScenario();
+      setActivityInsights([defaultInsight]);
     }
-  }, [activityInsights.length])
+  }, [activityInsights.length]);
 
   /**
    * Handlers for Activity Insights management
@@ -320,32 +341,34 @@ export function InfoPanel() {
       generateMeetingHeavyScenario(),
       generateProjectDeadlineScenario(),
       generateBugFixScenario(),
-    ]
+    ];
 
-    const newInsight = scenarios[Math.floor(Math.random() * scenarios.length)]
+    const newInsight = scenarios[Math.floor(Math.random() * scenarios.length)];
 
     // Add the new insight at the beginning of the array
-    setActivityInsights((prev) => [newInsight, ...prev])
-  }
+    setActivityInsights((prev) => [newInsight, ...prev]);
+  };
 
   const removeInsight = (id: string) => {
-    setActivityInsights((prev) => prev.filter((insight) => insight.id !== id))
-  }
+    setActivityInsights((prev) => prev.filter((insight) => insight.id !== id));
+  };
 
   /**
    * Handlers for Action Items management
    */
   const handlePromptAction = (prompt: string) => {
     // This would be connected to the chat panel in a real implementation
-    console.log("Action prompt:", prompt)
+    console.log("Action prompt:", prompt);
     // Here you would trigger the chat panel to use this prompt
-  }
+  };
 
   const toggleActionCompleted = (id: string) => {
     setActions((prev) =>
-      prev.map((action) => (action.id === id ? { ...action, completed: !action.completed } : action)),
-    )
-  }
+      prev.map((action) =>
+        action.id === id ? { ...action, completed: !action.completed } : action
+      )
+    );
+  };
 
   const addNewAction = () => {
     const newAction: ActionItem = {
@@ -353,27 +376,29 @@ export function InfoPanel() {
       text: "New action item",
       prompt: "Help me with this new task",
       completed: false,
-    }
+    };
 
-    setActions((prev) => [newAction, ...prev])
-  }
+    setActions((prev) => [newAction, ...prev]);
+  };
 
   const updateActionText = (id: string, text: string) => {
-    setActions((prev) => prev.map((action) => (action.id === id ? { ...action, text } : action)))
-  }
+    setActions((prev) =>
+      prev.map((action) => (action.id === id ? { ...action, text } : action))
+    );
+  };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
+    const { active, over } = event;
 
     if (over && active.id !== over.id) {
       setActions((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id)
-        const newIndex = items.findIndex((item) => item.id === over.id)
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
 
-        return arrayMove(items, oldIndex, newIndex)
-      })
+        return arrayMove(items, oldIndex, newIndex);
+      });
     }
-  }
+  };
 
   /**
    * Main component layout with 6:4 ratio between Activity Insights and Action Items
@@ -389,7 +414,12 @@ export function InfoPanel() {
               <BarChart className="h-4 w-4 text-[#1E6B68]" />
               Activity Insights
             </h4>
-            <Button variant="outline" size="sm" className="gap-1" onClick={generateNewInsight}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1"
+              onClick={generateNewInsight}
+            >
               <BarChart className="h-3 w-3" />
               <span className="text-xs">Generate</span>
             </Button>
@@ -408,7 +438,9 @@ export function InfoPanel() {
                       Summary
                     </h4>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">{formatTimestamp(insight.timestamp)}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {formatTimestamp(insight.timestamp)}
+                      </span>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -458,7 +490,9 @@ export function InfoPanel() {
                                         <span>{item.text}</span>
                                       </div>
                                       {item.time && (
-                                        <span className="text-xs text-muted-foreground ml-5">{item.time}</span>
+                                        <span className="text-xs text-muted-foreground ml-5">
+                                          {item.time}
+                                        </span>
                                       )}
                                     </div>
                                     {item.link && (
@@ -466,7 +500,9 @@ export function InfoPanel() {
                                         variant="ghost"
                                         size="sm"
                                         className="h-6 px-2 text-xs ml-2"
-                                        onClick={() => window.open(item.link, "_blank")}
+                                        onClick={() =>
+                                          window.open(item.link, "_blank")
+                                        }
                                       >
                                         <ExternalLink className="h-3 w-3 mr-1" />
                                         {item.linkText}
@@ -519,7 +555,12 @@ export function InfoPanel() {
               <ListTodo className="h-4 w-4 text-[#1E6B68]" />
               Action Items
             </h4>
-            <Button variant="outline" size="sm" className="h-8 w-8 p-0" onClick={addNewAction}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={addNewAction}
+            >
               <Plus className="h-4 w-4" />
               <span className="sr-only">Add Action</span>
             </Button>
@@ -527,8 +568,15 @@ export function InfoPanel() {
         </div>
 
         <ScrollArea className="flex-1 px-4 py-4">
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={actions.map((action) => action.id)} strategy={verticalListSortingStrategy}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={actions.map((action) => action.id)}
+              strategy={verticalListSortingStrategy}
+            >
               <div className="space-y-2">
                 {actions.map((action) => (
                   <SortableActionItem
@@ -545,7 +593,7 @@ export function InfoPanel() {
         </ScrollArea>
       </div>
     </div>
-  )
+  );
 }
 
 /**
@@ -571,45 +619,45 @@ function generateDevelopmentScenario(): ActivityInsight {
       "You're in active development mode today with 15 new commits across 3 repositories. There are 4 pull requests awaiting your review, and the team is discussing API changes in Slack. You have a code review meeting at 3:00 PM and the sprint planning is tomorrow morning.",
     details: [
       {
-        title: "GitHub Activity",
-        icon: <Github className="h-4 w-4 text-[#24292e]" />,
+        title: "Notion Workspace",
+        icon: <FileText className="h-4 w-4 text-black" />,
         items: [
           {
-            id: "gh1",
-            text: "PR #342: Add responsive design to dashboard components",
-            time: "Opened by Sarah Chen 2 hours ago",
-            link: "https://github.com",
-            linkText: "View PR",
+            id: "notion1",
+            text: "API Documentation Updates",
+            time: "Updated by Sarah Chen 2 hours ago",
+            link: "https://notion.so",
+            linkText: "Open",
             priority: "high",
           },
           {
-            id: "gh2",
-            text: "PR #339: Fix authentication token refresh logic",
-            time: "Opened by Alex Johnson 4 hours ago",
-            link: "https://github.com",
-            linkText: "View PR",
+            id: "notion2",
+            text: "Authentication Flow Diagrams",
+            time: "Updated by Alex Johnson 4 hours ago",
+            link: "https://notion.so",
+            linkText: "Open",
           },
           {
-            id: "gh3",
-            text: "PR #337: Update API documentation",
-            time: "Opened by Miguel Santos yesterday",
-            link: "https://github.com",
-            linkText: "View PR",
+            id: "notion3",
+            text: "Project Timeline",
+            time: "Updated by Miguel Santos yesterday",
+            link: "https://notion.so",
+            linkText: "Open",
           },
           {
-            id: "gh4",
-            text: "Issue #156: Users unable to reset password in production",
-            time: "Opened by Support Team 30 minutes ago",
-            link: "https://github.com",
-            linkText: "View Issue",
+            id: "notion4",
+            text: "Bug Tracking Database",
+            time: "New entry: 'Users unable to reset password in production' 30 minutes ago",
+            link: "https://notion.so",
+            linkText: "View Database",
             priority: "high",
           },
           {
-            id: "gh5",
-            text: "You pushed 8 commits to frontend-app/main",
-            time: "Most recent: 'Fix navbar responsiveness' 45 minutes ago",
-            link: "https://github.com",
-            linkText: "View Commits",
+            id: "notion5",
+            text: "Frontend Components Documentation",
+            time: "You updated this page 45 minutes ago",
+            link: "https://notion.so",
+            linkText: "Continue Editing",
           },
         ],
       },
@@ -682,7 +730,7 @@ function generateDevelopmentScenario(): ActivityInsight {
       "Catch up on #frontend-team messages before tomorrow's sprint planning",
       "Prepare talking points for your 1:1 with your manager tomorrow",
     ],
-  }
+  };
 }
 
 function generateMeetingHeavyScenario(): ActivityInsight {
@@ -821,7 +869,7 @@ function generateMeetingHeavyScenario(): ActivityInsight {
       "Schedule focus time tomorrow morning to recover from today's meeting-heavy schedule",
       "Use the team lunch as an opportunity to informally discuss the deployment schedule",
     ],
-  }
+  };
 }
 
 function generateProjectDeadlineScenario(): ActivityInsight {
@@ -832,60 +880,37 @@ function generateProjectDeadlineScenario(): ActivityInsight {
       "You're approaching a major project deadline in 2 days. There are 7 outstanding tasks assigned to you, and 3 are marked as high priority. The team has increased activity with 28 commits today, and QA has reported 5 new bugs that need attention before release.",
     details: [
       {
-        title: "Project Tasks",
-        icon: <ListTodo className="h-4 w-4 text-[#0052CC]" />,
+        title: "Notion Workspace",
+        icon: <FileText className="h-4 w-4 text-black" />,
         items: [
           {
-            id: "task1",
-            text: "Fix user authentication edge cases",
-            time: "Due: Tomorrow, Estimated: 3 hours",
-            link: "https://jira.com",
-            linkText: "PROJ-423",
+            id: "notion1",
+            text: "Project Documentation Updates",
+            time: "Most recent: 15 minutes ago",
+            link: "https://notion.so",
+            linkText: "Open",
+          },
+          {
+            id: "notion2",
+            text: "Sprint Tasks Database",
+            time: "8 tasks completed today",
+            link: "https://notion.so",
+            linkText: "View Database",
+          },
+          {
+            id: "notion3",
+            text: "Project Requirements",
+            time: "Pending your review - updated 3 hours ago",
+            link: "https://notion.so",
+            linkText: "Review",
             priority: "high",
           },
           {
-            id: "task2",
-            text: "Implement error tracking integration",
-            time: "Due: Tomorrow, Estimated: 2 hours",
-            link: "https://jira.com",
-            linkText: "PROJ-418",
-            priority: "high",
-          },
-          {
-            id: "task3",
-            text: "Optimize dashboard loading performance",
-            time: "Due: In 2 days, Estimated: 4 hours",
-            link: "https://jira.com",
-            linkText: "PROJ-415",
-            priority: "high",
-          },
-          {
-            id: "task4",
-            text: "Update API documentation",
-            time: "Due: In 2 days, Estimated: 2 hours",
-            link: "https://jira.com",
-            linkText: "PROJ-410",
-          },
-          {
-            id: "task5",
-            text: "Write unit tests for new features",
-            time: "Due: In 2 days, Estimated: 3 hours",
-            link: "https://jira.com",
-            linkText: "PROJ-408",
-          },
-          {
-            id: "task6",
-            text: "Conduct code review for team PRs",
-            time: "Due: Today, Estimated: 1 hour",
-            link: "https://github.com",
-            linkText: "PRs",
-          },
-          {
-            id: "task7",
-            text: "Prepare release notes",
-            time: "Due: In 2 days, Estimated: 1 hour",
-            link: "https://jira.com",
-            linkText: "PROJ-425",
+            id: "notion4",
+            text: "Team Knowledge Base",
+            time: "New entry added 1 hour ago",
+            link: "https://notion.so",
+            linkText: "Open",
           },
         ],
       },
@@ -1005,7 +1030,7 @@ function generateProjectDeadlineScenario(): ActivityInsight {
       "Block at least 2 hours of uninterrupted time tomorrow for the performance optimization task",
       "Prepare a status update for the standup to ensure the team is aligned on priorities",
     ],
-  }
+  };
 }
 
 function generateBugFixScenario(): ActivityInsight {
@@ -1076,8 +1101,8 @@ function generateBugFixScenario(): ActivityInsight {
             id: "dep3",
             text: "Config change: Updated rate limiting parameters",
             time: "Applied: 2 hours 50 minutes ago",
-            link: "https://github.com",
-            linkText: "Commit",
+            link: "https://notion.so",
+            linkText: "Documentation",
           },
         ],
       },
@@ -1103,10 +1128,10 @@ function generateBugFixScenario(): ActivityInsight {
           },
           {
             id: "team3",
-            text: "Pull request created: 'Fix authentication service 500 error'",
+            text: "Notion page updated: 'Authentication Service Troubleshooting Guide'",
             time: "By: Senior Developer 20 minutes ago",
-            link: "https://github.com",
-            linkText: "Review",
+            link: "https://notion.so",
+            linkText: "Open",
             priority: "high",
           },
         ],
@@ -1146,6 +1171,5 @@ function generateBugFixScenario(): ActivityInsight {
       "Prepare for a potential rollback if the fix cannot be implemented quickly",
       "Keep the support team updated so they can communicate with affected customers",
     ],
-  }
+  };
 }
-

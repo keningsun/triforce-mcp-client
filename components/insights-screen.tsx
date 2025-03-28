@@ -1,10 +1,10 @@
-import { AppHeader } from "@/components/app-header"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { ArrowUp, MessageSquare, Mail, Video } from "lucide-react"
+import { AppHeader } from "@/components/app-header";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowUp, MessageSquare, Mail, Video, FileText } from "lucide-react";
 
 interface InsightsScreenProps {
-  onScreenChange: (screen: "dashboard" | "chat" | "insights") => void
+  onScreenChange: (screen: "dashboard" | "chat" | "insights") => void;
 }
 
 export function InsightsScreen({ onScreenChange }: InsightsScreenProps) {
@@ -38,7 +38,10 @@ export function InsightsScreen({ onScreenChange }: InsightsScreenProps) {
               <div className="relative w-40 h-40 rounded-full overflow-hidden">
                 <div
                   className="absolute inset-0 bg-primary"
-                  style={{ clipPath: "polygon(50% 50%, 0 0, 0 100%, 100% 100%, 100% 0)" }}
+                  style={{
+                    clipPath:
+                      "polygon(50% 50%, 0 0, 0 100%, 100% 100%, 100% 0)",
+                  }}
                 ></div>
                 <div
                   className="absolute inset-0 bg-green-500"
@@ -50,7 +53,9 @@ export function InsightsScreen({ onScreenChange }: InsightsScreenProps) {
                 ></div>
                 <div
                   className="absolute inset-0 bg-red-500"
-                  style={{ clipPath: "polygon(50% 50%, 0 50%, 0 100%, 25% 100%)" }}
+                  style={{
+                    clipPath: "polygon(50% 50%, 0 50%, 0 100%, 25% 100%)",
+                  }}
                 ></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-20 h-20 rounded-full bg-background"></div>
@@ -93,7 +98,7 @@ export function InsightsScreen({ onScreenChange }: InsightsScreenProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>GitHub Activity</CardTitle>
+              <CardTitle>Notion Activity</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-end justify-between h-40 px-2">
@@ -135,7 +140,10 @@ export function InsightsScreen({ onScreenChange }: InsightsScreenProps) {
                   <span>65%</span>
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-primary" style={{ width: "65%" }}></div>
+                  <div
+                    className="h-full bg-primary"
+                    style={{ width: "65%" }}
+                  ></div>
                 </div>
               </div>
 
@@ -148,7 +156,10 @@ export function InsightsScreen({ onScreenChange }: InsightsScreenProps) {
                   <span>20%</span>
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-primary" style={{ width: "20%" }}></div>
+                  <div
+                    className="h-full bg-primary"
+                    style={{ width: "20%" }}
+                  ></div>
                 </div>
               </div>
 
@@ -161,7 +172,10 @@ export function InsightsScreen({ onScreenChange }: InsightsScreenProps) {
                   <span>15%</span>
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-primary" style={{ width: "15%" }}></div>
+                  <div
+                    className="h-full bg-primary"
+                    style={{ width: "15%" }}
+                  ></div>
                 </div>
               </div>
             </CardContent>
@@ -169,6 +183,5 @@ export function InsightsScreen({ onScreenChange }: InsightsScreenProps) {
         </div>
       </div>
     </section>
-  )
+  );
 }
-
