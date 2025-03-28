@@ -67,3 +67,69 @@
   display: none;
 }
 
+/* 添加Markdown渲染器样式 */
+.markdown-renderer {
+  @apply text-base leading-relaxed;
+}
+
+.markdown-renderer pre {
+  @apply my-2 p-4 rounded-md bg-gray-900 text-white overflow-x-auto;
+}
+
+.markdown-renderer code {
+  @apply text-sm font-mono;
+}
+
+.markdown-renderer table {
+  @apply w-full border-collapse;
+}
+
+.markdown-renderer img {
+  @apply max-w-full my-4 rounded-md;
+}
+
+.markdown-renderer a {
+  @apply text-[#1E6B68] hover:underline;
+}
+
+.markdown-renderer blockquote {
+  @apply italic border-l-4 border-[#1E6B68] pl-4 my-4;
+}
+
+/* 高亮显示代码块的不同部分 */
+.markdown-renderer .token.comment,
+.markdown-renderer .token.prolog,
+.markdown-renderer .token.doctype,
+.markdown-renderer .token.cdata {
+  @apply text-gray-400;
+}
+
+.markdown-renderer .token.punctuation {
+  @apply text-gray-300;
+}
+
+.markdown-renderer .token.property,
+.markdown-renderer .token.keyword,
+.markdown-renderer .token.tag {
+  @apply text-blue-400;
+}
+
+.markdown-renderer .token.string {
+  @apply text-green-400;
+}
+
+.markdown-renderer .token.operator,
+.markdown-renderer .token.entity,
+.markdown-renderer .token.url {
+  @apply text-yellow-400;
+}
+
+.markdown-renderer .token.function,
+.markdown-renderer .token.class-name {
+  @apply text-purple-400;
+}
+
+.markdown-renderer .token.boolean,
+.markdown-renderer .token.number {
+  @apply text-orange-400;
+}

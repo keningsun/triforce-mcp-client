@@ -21,6 +21,7 @@ import { TriforceIcon } from "./triforce-icon";
 import { useMCPChat } from "@/lib/hooks/use-mcp-chat";
 import { useSession } from "next-auth/react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { MarkdownRenderer } from "./markdown-renderer";
 
 type SuggestedPrompt = {
   text: string;
@@ -157,6 +158,8 @@ export function ChatPanel() {
                     </>
                   )}
                 </div>
+              ) : message.role === "assistant" ? (
+                <MarkdownRenderer content={message.content} />
               ) : (
                 message.content
               )}
