@@ -5,8 +5,8 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 确保不拦截认证相关的API路由和错误日志路由
-  if (pathname.startsWith("/api/auth") || pathname === "/api/auth/_log") {
+  // 确保不拦截认证相关的API路由
+  if (pathname.startsWith("/api/auth")) {
     // 针对认证API路由，确保不缓存
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("Cache-Control", "no-store, max-age=0");
@@ -29,14 +29,6 @@ export async function middleware(request: NextRequest) {
         method: request.method,
         hasCookies: cookies.length > 0,
         hasAuthorization: request.headers.has("authorization"),
-      });
-    }
-
-    // 特别处理客户端错误日志路由
-    if (pathname === "/api/auth/_log") {
-      console.log("客户端错误日志请求:", {
-        method: request.method,
-        url: request.url,
       });
     }
 
@@ -87,16 +79,15 @@ export async function middleware(request: NextRequest) {
   }
 }
 
-// 配置匹配路径，排除_log路由
+// 配置匹配路径
 export const config = {
   matcher: [
     /*
      * 更精确的匹配路径:
-     * 1. 排除所有API认证路由中的_log
-     * 2. 排除静态资源
-     * 3. 仅匹配页面路由
+     * 1. 排除静态资源
+     * 2. 仅匹配页面路由
      */
-    "/((?!api/auth/_log|_next/static|_next/image|_next/data|favicon.ico).*)",
+    "/((?!_next/static|_next/image|_next/data|favicon.ico).*)",
     "/",
     "/dashboard",
     "/login",
