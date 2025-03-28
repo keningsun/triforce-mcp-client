@@ -5,9 +5,47 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 确保不拦截认证相关的API路由
-  if (pathname.startsWith("/api/auth")) {
-    return NextResponse.next();
+  // 确保不拦截认证相关的API路由和错误日志路由
+  if (pathname.startsWith("/api/auth") || pathname === "/api/auth/_log") {
+    // 针对认证API路由，确保不缓存
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("Cache-Control", "no-store, max-age=0");
+    requestHeaders.set("Pragma", "no-cache");
+    requestHeaders.set("Expires", "0");
+
+    // 为WebAuthn API添加特殊头部
+    if (pathname.startsWith("/api/auth/webauthn")) {
+      requestHeaders.set("X-WebAuthn-Route", "true");
+    }
+
+    // 记录从客户端到服务器的关键API请求
+    if (
+      pathname === "/api/auth/session" ||
+      pathname === "/api/auth/csrf" ||
+      pathname === "/api/auth/callback/passkey"
+    ) {
+      const cookies = request.cookies.toString();
+      console.log(`关键API请求: ${pathname}`, {
+        method: request.method,
+        hasCookies: cookies.length > 0,
+        hasAuthorization: request.headers.has("authorization"),
+      });
+    }
+
+    // 特别处理客户端错误日志路由
+    if (pathname === "/api/auth/_log") {
+      console.log("客户端错误日志请求:", {
+        method: request.method,
+        url: request.url,
+      });
+    }
+
+    // 返回带有修改后头部的响应，但不执行身份验证逻辑
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
   }
 
   try {
@@ -40,45 +78,8 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    // 克隆请求头以进行修改
-    const requestHeaders = new Headers(request.headers);
-
-    // 针对认证API路由，确保不缓存
-    if (pathname.startsWith("/api/auth")) {
-      console.log("添加无缓存标头到认证路由:", pathname);
-
-      // 添加禁止缓存的头部
-      requestHeaders.set("Cache-Control", "no-store, max-age=0");
-      requestHeaders.set("Pragma", "no-cache");
-      requestHeaders.set("Expires", "0");
-    }
-
-    // 为WebAuthn API添加特殊头部
-    if (pathname.startsWith("/api/auth/webauthn")) {
-      console.log("添加WebAuthn相关头部:", pathname);
-      requestHeaders.set("X-WebAuthn-Route", "true");
-    }
-
-    // 记录从客户端到服务器的关键API请求
-    if (
-      pathname === "/api/auth/session" ||
-      pathname === "/api/auth/csrf" ||
-      pathname === "/api/auth/callback/passkey"
-    ) {
-      const cookies = request.cookies.toString();
-      console.log(`关键API请求: ${pathname}`, {
-        method: request.method,
-        hasCookies: cookies.length > 0,
-        hasAuthorization: request.headers.has("authorization"),
-      });
-    }
-
-    // 返回带有修改后头部的响应
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    });
+    // 请求继续
+    return NextResponse.next();
   } catch (error) {
     console.error("Middleware error:", error);
     // 发生错误时，允许请求继续，避免阻塞关键功能
@@ -86,16 +87,16 @@ export async function middleware(request: NextRequest) {
   }
 }
 
-// 配置匹配路径
+// 配置匹配路径，排除_log路由
 export const config = {
   matcher: [
     /*
      * 更精确的匹配路径:
-     * 1. 排除所有API认证路由
+     * 1. 排除所有API认证路由中的_log
      * 2. 排除静态资源
      * 3. 仅匹配页面路由
      */
-    "/((?!api/auth|_next/static|_next/image|_next/data|favicon.ico).*)",
+    "/((?!api/auth/_log|_next/static|_next/image|_next/data|favicon.ico).*)",
     "/",
     "/dashboard",
     "/login",
