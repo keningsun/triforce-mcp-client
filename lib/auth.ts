@@ -2,6 +2,8 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
+import type { AuthOptions } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import type { Session, User } from "next-auth";
 
 // 使用全局变量保证Prisma实例唯一性，避免开发环境中的连接过多问题
@@ -18,10 +20,10 @@ console.log("Auth Configuration:", {
 });
 
 // 使用NextAuth v4 API创建认证处理器
-export default NextAuth({
+const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: "jwt", // 使用JWT而不是数据库会话，更可靠
+    strategy: "jwt" as const, // 使用JWT而不是数据库会话，更可靠
     maxAge: 30 * 24 * 60 * 60, // 30天
   },
   secret: process.env.AUTH_SECRET, // 确保设置了密钥
@@ -70,14 +72,14 @@ export default NextAuth({
     error: "/auth/error", // 添加自定义错误页面路径
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: User }) {
       // 首次登录时，将数据库用户信息保存到JWT中
       if (user) {
         token.id = user.id;
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       // 从JWT中获取用户ID，而不是从数据库
       if (session.user && token) {
         session.user.id = token.id as string;
@@ -87,16 +89,19 @@ export default NextAuth({
   },
   debug: process.env.NODE_ENV === "development",
   logger: {
-    error(code, ...message) {
+    error(code: string, ...message: any[]) {
       console.error(`[next-auth][error][${code}]`, ...message);
     },
-    warn(code, ...message) {
+    warn(code: string, ...message: any[]) {
       console.warn(`[next-auth][warn][${code}]`, ...message);
     },
-    debug(code, ...message) {
+    debug(code: string, ...message: any[]) {
       if (process.env.NODE_ENV === "development") {
         console.debug(`[next-auth][debug][${code}]`, ...message);
       }
     },
   },
-});
+};
+
+// 导出 authOptions
+export default authOptions;

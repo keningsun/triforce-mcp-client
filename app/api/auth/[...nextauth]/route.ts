@@ -1,28 +1,24 @@
-import authHandler from "@/lib/auth";
+import { NextRequest } from "next/server";
+import authOptions from "@/lib/auth";
+import NextAuth from "next-auth";
 
-// 添加更详细的错误处理
-export const GET = async (req: Request) => {
-  try {
-    console.log("NextAuth GET Request:", req.url);
-    return await authHandler(req);
-  } catch (error) {
-    console.error("NextAuth GET Error:", error);
-    return new Response(
-      JSON.stringify({ error: "Authentication handler failed" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
+// 使用 NextAuth v4 App Router 适配处理
+// 见文档: https://next-auth.js.org/configuration/initialization#route-handlers-app
+const handler = NextAuth(authOptions);
+
+// 导出 GET 和 POST 处理函数
+export const GET = (
+  req: NextRequest,
+  context: { params: { nextauth: string[] } }
+) => {
+  console.log("NextAuth GET Request Path:", context.params.nextauth);
+  return handler(req as any, context as any);
 };
 
-export const POST = async (req: Request) => {
-  try {
-    console.log("NextAuth POST Request:", req.url);
-    return await authHandler(req);
-  } catch (error) {
-    console.error("NextAuth POST Error:", error);
-    return new Response(
-      JSON.stringify({ error: "Authentication handler failed" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
+export const POST = (
+  req: NextRequest,
+  context: { params: { nextauth: string[] } }
+) => {
+  console.log("NextAuth POST Request Path:", context.params.nextauth);
+  return handler(req as any, context as any);
 };
