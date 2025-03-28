@@ -10,8 +10,8 @@ const prisma = new PrismaClient();
 // WebAuthn登录注册中使用的RP ID和名称
 const rpID = process.env.WEBAUTHN_RP_ID || "localhost";
 const rpName = "Triforce App";
-// 确保使用硬编码URL作为后备，而不是依赖可能过时的环境变量
-const expectedOrigin = "http://localhost:3000";
+// 确保使用环境变量作为主要来源，本地URL作为后备
+const expectedOrigin = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
 export async function POST(req: Request) {
   try {

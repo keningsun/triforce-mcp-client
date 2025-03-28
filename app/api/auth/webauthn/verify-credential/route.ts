@@ -14,7 +14,7 @@ const prisma = new PrismaClient();
 // WebAuthn登录注册中使用的RP ID和名称
 const rpID = process.env.WEBAUTHN_RP_ID || "localhost";
 // 确保使用硬编码URL作为后备，而不是依赖可能过时的环境变量
-const expectedOrigin = "http://localhost:3000";
+const expectedOrigin = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
 export async function POST(req: Request) {
   try {

@@ -40,6 +40,12 @@ export async function middleware(request: NextRequest) {
 // 配置匹配路径
 export const config = {
   matcher: [
+    /*
+     * 匹配所有路径，但排除:
+     * 1. 静态资源 (/_next/static, /_next/image, /favicon.ico，以及任何图片文件)
+     * 2. 调试工具 (如/debug)
+     * 注意: 不要过滤掉/api路径，因为某些API路径可能需要认证
+     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.svg$).*)",
   ],
 };
