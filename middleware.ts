@@ -46,7 +46,7 @@ export const config = {
      * 2. 排除静态资源
      * 3. 仅匹配页面路由
      */
-    "/((?!api|_next/static|_next/image|_next/data|favicon.ico).*)",
+    "/((?!api/|_next/static|_next/image|_next/data|favicon.ico).*)",
     "/",
     "/dashboard",
     "/login",
