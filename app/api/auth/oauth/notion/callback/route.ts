@@ -10,6 +10,8 @@ const NOTION_CLIENT_ID = process.env.NOTION_CLIENT_ID || "";
 const NOTION_CLIENT_SECRET = process.env.NOTION_CLIENT_SECRET || "";
 const NOTION_REDIRECT_URI = `${process.env.NEXTAUTH_URL}/api/auth/oauth/notion/callback`;
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: Request) {
   try {
     // 获取URL参数

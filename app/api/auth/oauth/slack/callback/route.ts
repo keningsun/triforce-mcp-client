@@ -8,7 +8,14 @@ const prisma = new PrismaClient();
 // Slack OAuth配置
 const SLACK_CLIENT_ID = process.env.SLACK_CLIENT_ID || "";
 const SLACK_CLIENT_SECRET = process.env.SLACK_CLIENT_SECRET || "";
-const SLACK_REDIRECT_URI = `${process.env.NEXTAUTH_URL}/api/auth/oauth/slack/callback`;
+
+// 修复URL中可能出现的双斜杠问题
+let baseUrl = process.env.NEXTAUTH_URL || "";
+// 确保baseUrl不以斜杠结尾
+if (baseUrl.endsWith("/")) {
+  baseUrl = baseUrl.slice(0, -1);
+}
+const SLACK_REDIRECT_URI = `${baseUrl}/api/auth/oauth/slack/callback`;
 
 export async function GET(request: Request) {
   try {
@@ -22,16 +29,14 @@ export async function GET(request: Request) {
     const session = await getServerSession();
 
     if (!session?.user?.email) {
-      return NextResponse.redirect(
-        `${process.env.NEXTAUTH_URL}/login?error=unauthorized`
-      );
+      return NextResponse.redirect(`${baseUrl}/login?error=unauthorized`);
     }
 
     // 检查错误
     if (error) {
       console.error("Slack OAuth error:", error);
       return NextResponse.redirect(
-        `${process.env.NEXTAUTH_URL}/settings/integrations?error=slack_oauth_denied`
+        `${baseUrl}/settings/integrations?error=slack_oauth_denied`
       );
     }
 
@@ -45,7 +50,7 @@ export async function GET(request: Request) {
 
     if (!storedToken) {
       return NextResponse.redirect(
-        `${process.env.NEXTAUTH_URL}/settings/integrations?error=invalid_state`
+        `${baseUrl}/settings/integrations?error=invalid_state`
       );
     }
 
@@ -62,13 +67,13 @@ export async function GET(request: Request) {
     // 如果令牌已过期
     if (new Date() > storedToken.expires) {
       return NextResponse.redirect(
-        `${process.env.NEXTAUTH_URL}/settings/integrations?error=expired_state`
+        `${baseUrl}/settings/integrations?error=expired_state`
       );
     }
 
     if (!code) {
       return NextResponse.redirect(
-        `${process.env.NEXTAUTH_URL}/settings/integrations?error=missing_code`
+        `${baseUrl}/settings/integrations?error=missing_code`
       );
     }
 
@@ -91,7 +96,7 @@ export async function GET(request: Request) {
     if (!tokenData.ok || !tokenData.access_token) {
       console.error("Failed to exchange code for token:", tokenData);
       return NextResponse.redirect(
-        `${process.env.NEXTAUTH_URL}/settings/integrations?error=token_exchange_failed`
+        `${baseUrl}/settings/integrations?error=token_exchange_failed`
       );
     }
 
@@ -104,7 +109,7 @@ export async function GET(request: Request) {
 
     if (!user) {
       return NextResponse.redirect(
-        `${process.env.NEXTAUTH_URL}/settings/integrations?error=user_not_found`
+        `${baseUrl}/settings/integrations?error=user_not_found`
       );
     }
 
@@ -218,3 +223,6 @@ export async function GET(request: Request) {
     );
   }
 }
+
+// 明确标记该路由为动态路由，避免静态生成
+export const dynamic = "force-dynamic";

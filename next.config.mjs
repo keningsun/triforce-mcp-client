@@ -33,6 +33,8 @@ const nextConfig = {
   generateBuildId: async () => {
     return `build-${Date.now()}`;
   },
+  // 修复API路由的静态生成问题
+  serverComponentsExternalPackages: ["@prisma/client", "prisma"],
 };
 
 function mergeConfig(nextConfig, userConfig) {

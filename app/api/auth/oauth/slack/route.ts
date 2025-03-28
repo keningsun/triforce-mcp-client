@@ -8,7 +8,15 @@ const prisma = new PrismaClient();
 // Slack OAuth配置
 const SLACK_CLIENT_ID = String(process.env.SLACK_CLIENT_ID || "");
 const SLACK_CLIENT_SECRET = String(process.env.SLACK_CLIENT_SECRET || "");
-const SLACK_REDIRECT_URI = `${process.env.NEXTAUTH_URL}/api/auth/oauth/slack/callback`;
+
+// 修复URL中可能出现的双斜杠问题
+let baseUrl = process.env.NEXTAUTH_URL || "";
+// 确保baseUrl不以斜杠结尾
+if (baseUrl.endsWith("/")) {
+  baseUrl = baseUrl.slice(0, -1);
+}
+const SLACK_REDIRECT_URI = `${baseUrl}/api/auth/oauth/slack/callback`;
+
 const SLACK_SCOPES = "chat:write,channels:read,users:read";
 
 // 输出环境变量值用于调试
@@ -68,3 +76,6 @@ export async function GET() {
     );
   }
 }
+
+// 明确标记该路由为动态路由，避免静态生成
+export const dynamic = "force-dynamic";

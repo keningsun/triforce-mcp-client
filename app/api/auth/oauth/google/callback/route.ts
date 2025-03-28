@@ -14,6 +14,9 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || "";
 const GOOGLE_REDIRECT_URI = `${process.env.NEXTAUTH_URL}/api/auth/oauth/google/callback`;
 
+// 添加导出配置，明确标记为动态路由
+export const dynamic = "force-dynamic";
+
 export async function GET(request: Request) {
   try {
     console.log("===== Google OAuth回调处理开始 =====");

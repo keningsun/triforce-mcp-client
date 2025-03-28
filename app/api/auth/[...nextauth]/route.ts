@@ -22,3 +22,6 @@ export const POST = (
   console.log("NextAuth POST Request Path:", context.params.nextauth);
   return handler(req as any, context as any);
 };
+
+// 明确标记为动态路由
+export const dynamic = "force-dynamic";

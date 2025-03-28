@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,8 +14,8 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 
-export default function AuthError() {
-  const router = useRouter();
+// 提取错误消息组件，用于Suspense
+function ErrorContent() {
   const searchParams = useSearchParams();
   const [errorMessage, setErrorMessage] = useState<string>("");
 
@@ -50,6 +50,19 @@ export default function AuthError() {
   }, [searchParams]);
 
   return (
+    <Alert variant="destructive" className="mb-4">
+      <ExclamationTriangleIcon className="h-4 w-4" />
+      <AlertTitle>错误</AlertTitle>
+      <AlertDescription>{errorMessage}</AlertDescription>
+    </Alert>
+  );
+}
+
+// 页面组件
+export default function AuthError() {
+  const router = useRouter();
+
+  return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <Card className="w-full max-w-md">
         <CardHeader>
@@ -57,11 +70,9 @@ export default function AuthError() {
           <CardDescription>登录过程中发生了错误</CardDescription>
         </CardHeader>
         <CardContent>
-          <Alert variant="destructive" className="mb-4">
-            <ExclamationTriangleIcon className="h-4 w-4" />
-            <AlertTitle>错误</AlertTitle>
-            <AlertDescription>{errorMessage}</AlertDescription>
-          </Alert>
+          <Suspense fallback={<div>加载中...</div>}>
+            <ErrorContent />
+          </Suspense>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="ghost" onClick={() => router.back()}>

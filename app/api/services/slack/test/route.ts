@@ -74,3 +74,6 @@ export async function GET() {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+
+// 添加导出配置，明确标记为动态路由
+export const dynamic = "force-dynamic";
