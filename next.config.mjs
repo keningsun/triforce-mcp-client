@@ -35,6 +35,49 @@ const nextConfig = {
   },
   // 修复API路由的静态生成问题
   serverComponentsExternalPackages: ["@prisma/client", "prisma"],
+  // 确保API路由可以正确处理会话
+  async headers() {
+    return [
+      {
+        // 为所有API路由添加特殊头部
+        source: "/api/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store, max-age=0",
+          },
+        ],
+      },
+      {
+        // 专门为认证API添加头部
+        source: "/api/auth/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store, max-age=0",
+          },
+        ],
+      },
+    ];
+  },
+  // 优化认证路由的缓存行为
+  async rewrites() {
+    return {
+      beforeFiles: [
+        // 确保session API始终从服务器获取
+        {
+          source: "/api/auth/session",
+          destination: "/api/auth/session",
+          has: [
+            {
+              type: "header",
+              key: "cookie",
+            },
+          ],
+        },
+      ],
+    };
+  },
 };
 
 function mergeConfig(nextConfig, userConfig) {

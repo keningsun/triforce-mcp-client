@@ -38,11 +38,13 @@ const authOptions: AuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email) {
-          console.error("Missing credentials");
+          console.error("Missing credentials in authorize function");
           return null;
         }
 
         try {
+          console.log("授权流程开始:", credentials.email);
+
           // 查找用户
           const user = await prisma.users.findUnique({
             where: { email: credentials.email },
@@ -50,6 +52,7 @@ const authOptions: AuthOptions = {
 
           // 如果找到用户，返回用户信息
           if (user) {
+            console.log("已找到用户，返回用户数据:", user.email);
             return {
               id: user.id,
               email: user.email,
@@ -58,10 +61,10 @@ const authOptions: AuthOptions = {
             };
           }
 
-          console.log("User not found:", credentials.email);
+          console.log("用户不存在:", credentials.email);
           return null;
         } catch (error) {
-          console.error("Error in Passkey authorize:", error);
+          console.error("Passkey授权错误:", error);
           return null;
         }
       },
@@ -73,18 +76,38 @@ const authOptions: AuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }: { token: JWT; user?: User }) {
-      // 首次登录时，将数据库用户信息保存到JWT中
-      if (user) {
-        token.id = user.id;
+      try {
+        // 首次登录时，将数据库用户信息保存到JWT中
+        if (user) {
+          console.log("JWT回调: 用户首次登录, 设置token.id = user.id");
+          token.id = user.id;
+        } else {
+          console.log("JWT回调: 使用现有token");
+        }
+        return token;
+      } catch (error) {
+        console.error("JWT回调错误:", error);
+        return token;
       }
-      return token;
     },
     async session({ session, token }: { session: Session; token: JWT }) {
-      // 从JWT中获取用户ID，而不是从数据库
-      if (session.user && token) {
-        session.user.id = token.id as string;
+      try {
+        // 从JWT中获取用户ID，而不是从数据库
+        if (session?.user && token) {
+          console.log("会话回调: 设置session.user.id");
+          session.user.id = token.id as string;
+        } else {
+          console.log("会话回调: session或token不完整", {
+            hasSession: !!session,
+            hasUser: !!session?.user,
+            hasToken: !!token,
+          });
+        }
+        return session;
+      } catch (error) {
+        console.error("会话回调错误:", error);
+        return session;
       }
-      return session;
     },
   },
   debug: process.env.NODE_ENV === "development",
@@ -99,6 +122,38 @@ const authOptions: AuthOptions = {
       if (process.env.NODE_ENV === "development") {
         console.debug(`[next-auth][debug][${code}]`, ...message);
       }
+    },
+  },
+  events: {
+    async signIn(message) {
+      console.log("登录事件:", {
+        user: message.user.email,
+        isNewUser: message.isNewUser,
+      });
+    },
+    async signOut(message) {
+      console.log("登出事件:", {
+        session: message.session ? "存在" : "不存在",
+      });
+    },
+    async createUser(message) {
+      console.log("创建用户事件:", {
+        id: message.user.id,
+        email: message.user.email,
+      });
+    },
+    async linkAccount(message) {
+      console.log("账号关联事件:", message);
+    },
+    async session(message) {
+      // 会话更新事件
+      console.log("会话更新事件");
+    },
+    async updateUser(message) {
+      console.log("用户更新事件:", {
+        id: message.user.id,
+        email: message.user.email,
+      });
     },
   },
 };

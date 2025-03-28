@@ -26,3 +26,6 @@ const services = [
 export async function GET() {
   return NextResponse.json(services);
 }
+
+// 添加导出配置，明确标记为动态路由
+export const dynamic = "force-dynamic";
