@@ -41,11 +41,15 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * 匹配所有路径，但排除:
-     * 1. 静态资源 (/_next/static, /_next/image, /favicon.ico，以及任何图片文件)
-     * 2. 调试工具 (如/debug)
-     * 注意: 不要过滤掉/api路径，因为某些API路径可能需要认证
+     * 更精确的匹配路径:
+     * 1. 排除API路由 - 这些路由不应该被中间件拦截
+     * 2. 排除静态资源
+     * 3. 仅匹配页面路由
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.svg$).*)",
+    "/((?!api|_next/static|_next/image|_next/data|favicon.ico).*)",
+    "/",
+    "/dashboard",
+    "/login",
+    "/settings/:path*",
   ],
 };

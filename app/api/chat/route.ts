@@ -1,6 +1,7 @@
 import { experimental_createMCPClient, streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { refreshGoogleToken } from "@/lib/refresh-google-token";
+import { getCurrentTimeForSystemPrompt } from "@/lib/utils/time";
 
 // 添加超时函数辅助函数
 const withTimeout = <T>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
@@ -214,7 +215,10 @@ ${toolResultsContent}
     const finalResponse = await streamText({
       model: openai("gpt-4o"),
       messages: [
-        { role: "system", content: systemMessage },
+        {
+          role: "system",
+          content: systemMessage + "\n\n" + getCurrentTimeForSystemPrompt(),
+        },
         { role: "user", content: toolResultPrompt },
       ],
       maxTokens: 4096,
@@ -368,7 +372,8 @@ export async function POST(req: Request) {
         `When using tools, always use the actual userId value '${userId}' as the user_id parameter, NOT the string 'user_id'. ` +
         "You can directly use the tools to access the user's data as the authentication has already been handled. " +
         "Analyze the user's query carefully and decide when tools can help provide better information. " +
-        "Use tools proactively when they can enhance your response, but avoid using them when unnecessary.";
+        "Use tools proactively when they can enhance your response, but avoid using them when unnecessary.\n\n" +
+        getCurrentTimeForSystemPrompt();
 
       // 使用 Vercel AI SDK 的 streamText 函数处理请求
       console.log("创建流式完成，请求参数:", {
@@ -509,7 +514,8 @@ export async function POST(req: Request) {
           {
             role: "system",
             content:
-              "You are a helpful assistant. The user tried to use MCP tools but there was an error with the tools. Please respond to their query as best you can without using tools, and inform them there was a tool error.",
+              "You are a helpful assistant. The user tried to use MCP tools but there was an error with the tools. Please respond to their query as best you can without using tools, and inform them there was a tool error.\n\n" +
+              getCurrentTimeForSystemPrompt(),
           },
           { role: "user", content: prompt },
         ],

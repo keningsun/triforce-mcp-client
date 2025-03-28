@@ -19,7 +19,7 @@ import {
 import { TriforceIcon } from "./triforce-icon";
 import { useMCPChat } from "@/lib/hooks/use-mcp-chat";
 import { useSession } from "next-auth/react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { MarkdownRenderer } from "./markdown-renderer";
 
 type SuggestedPrompt = {
@@ -81,7 +81,7 @@ export function ChatPanel() {
     initialMessages: [
       {
         id: "1",
-        role: "system",
+        role: "assistant",
         content: "Welcome to Triforce. How can I help you today?",
         timestamp: new Date(),
       },
@@ -96,81 +96,90 @@ export function ChatPanel() {
       <div className="flex-1 overflow-auto p-4 space-y-4">
         {error && (
           <Alert variant="destructive" className="mb-4">
-            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex gap-3 ${
-              message.role === "user" ? "justify-end" : "justify-start"
-            }`}
-          >
-            {message.role !== "user" && (
-              <div className="flex-shrink-0 h-8 w-8 rounded-full bg-[#1E6B68] flex items-center justify-center">
-                {message.role === "system" ? (
-                  <div className="w-5 h-5">
-                    <TriforceIcon color="white" />
-                  </div>
-                ) : (
-                  <Bot className="h-5 w-5 text-white" />
-                )}
-              </div>
-            )}
-
+        {messages
+          .filter(
+            (message) =>
+              // 只过滤掉包含时间信息的系统消息，保留其他系统消息
+              !(
+                message.role === "system" &&
+                message.content.includes("Current date and time information")
+              )
+          )
+          .map((message) => (
             <div
-              className={`max-w-[80%] rounded-lg p-3 ${
-                message.role === "user"
-                  ? "bg-[#1E6B68] text-white"
-                  : message.role === "system"
-                  ? "bg-muted"
-                  : "bg-background border"
+              key={message.id}
+              className={`flex gap-3 ${
+                message.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
-              {message.content === "" && message.role === "assistant" ? (
-                <div className="text-muted-foreground">
-                  {extractedContent ? (
-                    // 显示从数据流中提取的内容
-                    <div>{extractedContent}</div>
+              {message.role !== "user" && (
+                <div className="flex-shrink-0 h-8 w-8 rounded-full bg-[#1E6B68] flex items-center justify-center">
+                  {message.role === "system" ? (
+                    <div className="w-5 h-5">
+                      <TriforceIcon color="white" />
+                    </div>
                   ) : (
-                    <>
-                      <div className="mb-2 font-medium">
-                        Working on your request...
-                      </div>
-                      <div className="flex items-center gap-2 text-sm mb-2">
-                        <Clock className="h-4 w-4" />
-                        <span>Using tools to find information</span>
-                      </div>
-
-                      {toolData && (
-                        <div className="mt-2 border-t pt-2 text-xs">
-                          <div className="font-medium mb-1">
-                            Raw Data Stream:
-                          </div>
-                          <pre className="bg-gray-100 p-2 rounded overflow-x-auto text-xs">
-                            {JSON.stringify(toolData, null, 2)}
-                          </pre>
-                        </div>
-                      )}
-                    </>
+                    <Bot className="h-5 w-5 text-white" />
                   )}
                 </div>
-              ) : message.role === "assistant" && message.content ? (
-                <MarkdownRenderer content={message.content} />
-              ) : (
-                message.content
+              )}
+
+              <div
+                className={`max-w-[80%] rounded-lg p-3 ${
+                  message.role === "user"
+                    ? "bg-[#1E6B68] text-white"
+                    : message.role === "system"
+                    ? "bg-muted"
+                    : "bg-background border"
+                }`}
+              >
+                {message.content === "" && message.role === "assistant" ? (
+                  <div className="text-muted-foreground">
+                    {extractedContent ? (
+                      // 显示从数据流中提取的内容
+                      <div>{extractedContent}</div>
+                    ) : (
+                      <>
+                        <div className="mb-2 font-medium">
+                          Working on your request...
+                        </div>
+                        <div className="flex items-center gap-2 text-sm mb-2">
+                          <Clock className="h-4 w-4" />
+                          <span>Using tools to find information</span>
+                        </div>
+
+                        {toolData && (
+                          <div className="mt-2 border-t pt-2 text-xs">
+                            <div className="font-medium mb-1">
+                              Raw Data Stream:
+                            </div>
+                            <pre className="bg-gray-100 p-2 rounded overflow-x-auto text-xs">
+                              {JSON.stringify(toolData, null, 2)}
+                            </pre>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                ) : message.role === "assistant" && message.content ? (
+                  <MarkdownRenderer content={message.content} />
+                ) : (
+                  message.content
+                )}
+              </div>
+
+              {message.role === "user" && (
+                <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                  <User className="h-5 w-5 text-gray-600" />
+                </div>
               )}
             </div>
-
-            {message.role === "user" && (
-              <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                <User className="h-5 w-5 text-gray-600" />
-              </div>
-            )}
-          </div>
-        ))}
+          ))}
 
         {isLoading && (
           <div className="flex gap-3">

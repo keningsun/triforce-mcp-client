@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useChat } from "ai/react";
+import { getCurrentTimeForSystemPrompt } from "@/lib/utils/time";
 
 export type Message = {
   id: string;
@@ -83,12 +84,21 @@ export function useMCPChat({ userId, initialMessages = [] }: UseMCPChatProps) {
     body: {
       userId: userId,
     },
-    initialMessages: initialMessages.map((msg) => ({
-      id: msg.id,
-      role: msg.role,
-      content: msg.content,
-    })),
-    maxSteps: 20, // 允许最多3轮工具调用循环
+    initialMessages: [
+      // 添加一个系统消息，包含当前时间信息
+      {
+        id: "system-1",
+        role: "system",
+        content:
+          "You are a helpful AI assistant. " + getCurrentTimeForSystemPrompt(),
+      },
+      ...initialMessages.map((msg) => ({
+        id: msg.id,
+        role: msg.role,
+        content: msg.content,
+      })),
+    ],
+    maxSteps: 20, // 允许最多20轮工具调用循环
     onFinish: (message) => {
       console.log("onFinish called with message:", message);
     },
@@ -206,14 +216,23 @@ export function useMCPChat({ userId, initialMessages = [] }: UseMCPChatProps) {
   useEffect(() => {
     if (aiMessages.length > 0) {
       // 创建一个新的消息数组，避免直接依赖 extractedContent
-      const convertedMessages = aiMessages.map((msg) => {
-        return {
-          id: msg.id,
-          role: msg.role as "user" | "assistant" | "system",
-          content: msg.content,
-          timestamp: new Date(),
-        };
-      });
+      const convertedMessages = aiMessages
+        .filter(
+          (msg) =>
+            // 只过滤掉包含时间信息的系统消息，保留其他系统消息
+            !(
+              msg.role === "system" &&
+              msg.content.includes("Current date and time information")
+            )
+        )
+        .map((msg) => {
+          return {
+            id: msg.id,
+            role: msg.role as "user" | "assistant" | "system",
+            content: msg.content,
+            timestamp: new Date(),
+          };
+        });
 
       setMessages(convertedMessages);
     }

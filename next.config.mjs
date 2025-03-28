@@ -16,11 +16,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // 简化实验性特性，减少潜在问题
   experimental: {
-    webpackBuildWorker: true,
-    parallelServerBuildTraces: true,
-    parallelServerCompiles: true,
-    serverMinification: true,
     optimizePackageImports: [
       "@radix-ui/react-icons",
       "@mui/material",
@@ -37,8 +34,6 @@ const nextConfig = {
     return `build-${Date.now()}`;
   },
 };
-
-mergeConfig(nextConfig, userConfig);
 
 function mergeConfig(nextConfig, userConfig) {
   if (!userConfig) {
@@ -59,5 +54,7 @@ function mergeConfig(nextConfig, userConfig) {
     }
   }
 }
+
+mergeConfig(nextConfig, userConfig);
 
 export default nextConfig;
