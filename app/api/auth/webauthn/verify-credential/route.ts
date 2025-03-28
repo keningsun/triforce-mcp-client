@@ -3,6 +3,7 @@ import {
   verifyRegistrationResponse,
   verifyAuthenticationResponse,
 } from "@simplewebauthn/server";
+import { isoBase64URL } from "@simplewebauthn/server/helpers";
 import { PrismaClient } from "@prisma/client";
 import type {
   RegistrationResponseJSON,
@@ -11,13 +12,64 @@ import type {
 
 const prisma = new PrismaClient();
 
-// WebAuthn登录注册中使用的RP ID和名称
-const rpID = process.env.WEBAUTHN_RP_ID || "localhost";
-// 确保使用硬编码URL作为后备，而不是依赖可能过时的环境变量
-const expectedOrigin = process.env.NEXTAUTH_URL || "http://localhost:3000";
+// Dynamic RP ID based on environment
+// For Vercel: get the deployment domain from environment or request
+// For localhost: use 'localhost'
+function getDynamicRpId(requestUrl: string) {
+  // If WEBAUTHN_RP_ID is explicitly set in env vars, use it
+  if (
+    process.env.WEBAUTHN_RP_ID &&
+    process.env.WEBAUTHN_RP_ID !== "localhost"
+  ) {
+    return process.env.WEBAUTHN_RP_ID;
+  }
+
+  // Extract hostname from request URL for production
+  try {
+    const url = new URL(requestUrl);
+    const hostname = url.hostname;
+
+    // If we're on localhost, return 'localhost'
+    if (hostname === "localhost" || hostname.includes("127.0.0.1")) {
+      return "localhost";
+    }
+
+    // Otherwise return the hostname (e.g., 'triforce-mcp-client.vercel.app')
+    return hostname;
+  } catch (error) {
+    // Fallback
+    return process.env.WEBAUTHN_RP_ID || "localhost";
+  }
+}
+
+// 获取预期的Origin
+function getDynamicOrigin(requestUrl: string) {
+  // If NEXTAUTH_URL is explicitly set in env vars, use it
+  if (process.env.NEXTAUTH_URL) {
+    return process.env.NEXTAUTH_URL;
+  }
+
+  // Extract origin from request URL
+  try {
+    const url = new URL(requestUrl);
+    return `${url.protocol}//${url.host}`;
+  } catch (error) {
+    // Fallback
+    return "http://localhost:3000";
+  }
+}
 
 export async function POST(req: Request) {
   try {
+    // Get dynamic values based on request
+    const rpID = getDynamicRpId(req.url);
+    const expectedOrigin = getDynamicOrigin(req.url);
+
+    console.log("WebAuthn Verification:", {
+      rpID,
+      expectedOrigin,
+    });
+
     const { credential, action = "authenticate", email } = await req.json();
 
     console.log("接收到的验证请求:", {

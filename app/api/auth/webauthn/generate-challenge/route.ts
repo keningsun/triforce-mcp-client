@@ -7,14 +7,47 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// WebAuthn登录注册中使用的RP ID和名称
-const rpID = process.env.WEBAUTHN_RP_ID || "localhost";
+// Dynamic RP ID based on environment
+// For Vercel: get the deployment domain from environment or request
+// For localhost: use 'localhost'
+function getDynamicRpId(requestUrl: string) {
+  // If WEBAUTHN_RP_ID is explicitly set in env vars, use it
+  if (
+    process.env.WEBAUTHN_RP_ID &&
+    process.env.WEBAUTHN_RP_ID !== "localhost"
+  ) {
+    return process.env.WEBAUTHN_RP_ID;
+  }
+
+  // Extract hostname from request URL for production
+  try {
+    const url = new URL(requestUrl);
+    const hostname = url.hostname;
+
+    // If we're on localhost, return 'localhost'
+    if (hostname === "localhost" || hostname.includes("127.0.0.1")) {
+      return "localhost";
+    }
+
+    // Otherwise return the hostname (e.g., 'triforce-mcp-client.vercel.app')
+    return hostname;
+  } catch (error) {
+    // Fallback
+    return process.env.WEBAUTHN_RP_ID || "localhost";
+  }
+}
+
+// WebAuthn登录注册中使用的RP名称
 const rpName = "Triforce App";
 // 确保使用环境变量作为主要来源，本地URL作为后备
 const expectedOrigin = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
 export async function POST(req: Request) {
   try {
+    // Get dynamic RP ID based on request
+    const rpID = getDynamicRpId(req.url);
+    console.log("Using WebAuthn RP ID:", rpID);
+
     let body;
     try {
       body = await req.json();
